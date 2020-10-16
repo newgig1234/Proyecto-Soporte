@@ -1,0 +1,436 @@
+<LoginWindow>:
+    name: "login"
+    legajo: legajo
+    contrasena: contrasena 
+    GridLayout:
+        rows:3
+        padding:50,50
+        BoxLayout:
+            orientation:'horizontal'
+            Label:
+                text:'SAA'
+        GridLayout:
+            cols:2
+            Label:
+                text:'legajo'
+            TextInput:
+                id: legajo
+                multiline:False
+                #text:'legajo'
+            Label:
+                text:'contrsena'
+            TextInput:
+                id: contrasena
+                password: True
+        BoxLayout:
+            orientation:'horizontal'
+            Button:
+                text:'Ingresar'
+                on_release:
+                    root.manager.transition.direction='left'
+                    root.login()
+            Button:
+                text:'Registrarse'
+                on_release:
+                    root.manager.transition.direction='left'
+                    root.registroBtn()
+
+<RegistroWindow>:
+    legajoReg: legajoReg
+    nombreReg: nombreReg
+    apellidoReg: apellidoReg
+    emailReg: emailReg
+    constrasenaReg: constrasenaReg
+    contrasena2Reg: contrasena2Reg
+    GridLayout:
+        rows:3
+        name: "registro"
+        padding: 10,10
+        spacing: 0
+        BoxLayout:
+            oriantation:'horizontal'
+            Label:
+                text: "Registro"    
+
+        GridLayout:
+            cols:2
+
+            Label:
+                text: "Legajo: "
+
+            TextInput:
+                id: legajoReg
+                multiline: False
+
+            Label:
+                text: "Nombre: "
+
+            TextInput:
+                id: nombreReg
+                multiline: False
+
+            Label:
+                text: "Apellido: "
+
+            TextInput:
+                id: apellidoReg
+                multiline: False
+                        
+            Label:
+                text: "Email: "
+
+            TextInput:
+                id: emailReg
+                multiline: False
+                                    
+            Label:
+                text: "Contraseña: "
+                
+            TextInput:
+                id: constrasenaReg
+                multiline: False
+                password: True
+                
+            Label:
+                text: "Repetir la contraseña: "
+
+            TextInput:
+                id: contrasena2Reg
+                multiline: False
+                password: True
+
+        BoxLayout:
+            orientation:'horizontal'
+
+            Button:
+                text: "Ya tienes cuenta? volver al login"               
+                on_release:
+                    root.manager.transition.direction = "right"
+                    root.login()
+            Button:
+                text: "Aceptar"
+                on_release:
+                    root.manager.transition.direction = "left"
+                    root.aceptar()
+
+
+
+<MenuPrincipal>:
+    name:'mp'
+    #variables aca
+    BoxLayout:
+        orientation:'vertical'
+        BoxLayout:
+            oriantation:'horizontal'
+            Label:
+                text:'Menu Principal'
+        BoxLayout:
+            orientation:'vertical'
+            GridLayout:
+                cols:3
+                padding:15,15
+                Button:
+                    text:'Mapa'
+                    on_release:
+                        root.manager.transition.direction='left'
+                        root.mapaBtn()
+                
+                Button:
+                    text:'Materias'
+                    on_release:
+                        root.manager.transition.direction='left'
+                        root.materiasBtn()
+                    
+                Button:
+                    text:'Editar materias'
+                    on_release:
+                        root.manager.transition.direction='left'
+                        root.editarMateriasBtn()
+
+                Button:
+                    text:'Consultas'
+                    on_release:
+                        root.manager.transition.direction='left'
+                        root.consultasBtn()
+
+                Button:
+                    text:'Bibliografía'
+                    on_release:
+                        root.manager.transition.direction='left'
+                        root.bibliografiaBtn()         
+
+                Button:
+                    text:'Editar perfil'
+                    on_release:
+                        root.manager.transition.direction='left'
+                        root.editarPerfilBtn()
+
+                Button:
+                    text:'Noticias'
+                    on_release:
+                        root.manager.transition.direction='left'
+                        root.noticiasBtn()
+
+        BoxLayout:
+            orientation: 'horizontal'
+            Button:
+                text:'Salir'
+                padding: 10,5
+                on_release:
+                    root.manager.transition.direction='right'
+                    root.logOut()
+
+<AgregarMateria>:
+    name:'am'
+    #variables
+    mat1:mat1
+    com1:com1
+    GridLayout:
+        rows:3
+        BoxLayout:
+            oriantation:'horizontal'
+            Label:
+                text:'Menu Principal'
+        RVmaterias:    
+        BoxLayout:
+            oriantation:'horizontal'
+            Button:
+                text:'Omitir'
+                padding:10
+                on_release:
+                    root.manager.transition: 'left'
+                    root.omitirBtn()
+            Button:
+                text:'Aceptar'
+                padding:10
+                on_release:
+                    root.manager.transition: 'right'
+                    root.aceptarBtn()
+
+<RVmaterias>:
+    data:[]
+    viewclass: 'Button'
+    RecycleBoxLayout:
+        #parametros
+        orientation:'horizontal'
+
+<Materias>:
+    name:'mat'
+    #varaibles
+    GridLayout:
+        cols:3
+        Button:
+            text:'botones'
+
+<Consulta>:
+    name:'con'
+    #variables
+    consultaC: consultaC
+    BoxLayout:
+        orientation:'vertical'
+        GridLayout:
+            rows:5
+            Label:
+                text:'Logo'#agregar Logo
+            Label:
+                text:'Nombre de materia'# deberia ser una variable que recupere de la bd
+            BoxLayout:
+                orientation:'horizontal'
+                TextInput:
+                    id:consultaC
+            Button:
+                text:'Enviar'
+                on_release:
+            Button:
+                text:'Atras'
+                on_release:
+                    root.manager.transition: 'right'
+                    root.btnVolverCon()
+
+<InfoMateria>:
+    name:'im'
+    noMat: noMat
+    diasCur: diasCur
+    horasCur: horasCur
+    aulaCur: aulaCur
+    #variables
+    BoxLayout:
+        orientation:'vertical'
+        BoxLayout:
+            padding: 10,10
+            GridLayout:
+                orientation: 'vertical'
+                cols:2
+                Label:
+                    text:'Nombre materia: '
+                Label:
+                    text: noMat
+                Label:
+                    text:'Dias cursado: '
+                Label:
+                    text: diasCur
+                Label:
+                    text:'Horarios cursado: '
+                Label:
+                    text: horasCur
+                Label:
+                    text:'Aula cursado: '
+                Label:
+                    text: aulaCur
+        BoxLayout:
+            Button:
+                text:'Volver'
+                on_release:
+                    root.manager.transition: 'right'
+                    root.volverBtnIm()
+
+<EditarPerfil>:
+    name:'ed'
+    #variables
+    nombreEP:nombreEP
+    apellidoEP:apellidoEP
+    emailEP:emailEP
+    contrasenaEP:contrasenaEP
+    repcontrasenaEP:repContrasenaEP
+    contrasenaActualEP:contrasenaActualEP
+
+    BoxLayout:
+        GridLayout:
+            rows:7
+            TextInput:
+                text:nombreEP
+            TextInput:
+                text:apellidoEP
+            TextInput:
+                text:emailEP
+            TextInput:
+                text:contrasenaEP
+                password:True
+            TextInput:
+                text:repContrasenaEP
+                password:True
+            TextInput:
+                text:contrasenaActualEP
+                password:True
+            BoxLayout:
+                orientation:'Horizontal'
+                Button:
+                    text:'Volver'
+                    on_release:
+                        root.manager.transition: 'right'
+                        root.volverBtnEp()
+                Button:
+                    text:'Confirmar'
+                    on_release:
+                        root.manager.transition: 'right'
+                        root.confirmarBtnEp()
+
+
+<Mapa>:
+    name:'mp'
+    BoxLayout:
+        orientation:'vertical'
+        BoxLayout:
+            Label:
+                text:'Imagen'#Logo
+        BoxLayout:
+            Label:
+                text: 'Número de piso'
+        BoxLayout:
+            padding:10,0
+            #Ver si se puede agregar screen que vaya pasando de imagen en imagen y cambie el numeor de piso
+        BoxLayout:
+            orientation:'horizontal'
+            Button:
+                text:'<-'
+                on_release:
+                    root.manager.transition: 'left'
+                    root.backBtnMp()
+            Button:
+                text:'Atras'
+                on_release:
+                    root.manager.transition: 'left'
+                    root.atrasBtnMp()
+            Button:
+                text:'->'
+                on_release:
+                    root.manager.transition: 'right'
+                    root.nextBtnMp()
+    
+<Noticias>: 
+    name:'not'
+    listaNots: listaNots
+    BoxLayout:
+        orientation:'vertical'
+        Label:
+            text:'Notificaciones'
+#         BoxLayout:
+#             orientation:'horizontal'
+#             Button:
+#                 text: 'Mis Noticias'
+#                 on_release:
+#                     root.manager.transition: 'right'
+#                     #root.
+#             Button:
+#                 text: 'Noticias Generales'
+#                 on_release:
+#                     root.manager.transition: 'right'
+#                     #root.
+        BoxLayout:
+            orientation:'vertical'
+            NotRV:
+
+
+<misNoticias>:
+    orientation:'horizontal'
+    data:[]
+    GridLayout:
+        rows:2
+        Label:
+            text:'Materia'   
+        Label:
+            text:'Asunto'
+    Button:
+        text:'Ir'
+        on_release:
+            root.manager.transition:'right'
+            root.irBtn()
+
+<NotRV>:
+    data:[]
+    viewclass:'misNoticias'
+    RecycleBoxLayout:
+        #parametros
+        orientation:'horizontal'
+
+
+<InfoNoticia>:
+    name:'in'
+    #variables
+    nm:nombreMateria
+    asunto: asunto
+    noti: noti
+    BoxLayout:
+        orientation:'vertical'
+        BoxLayout:
+            padding: 10,10
+            GridLayout:
+                cols:2
+                Label:
+                    text: 'Materia: '
+                Label:
+                    text:nombreMateria
+                Label:
+                    text:'Asunto:'
+                Label:
+                    text: asunto
+        BoxLayout:
+            orientation:'vertical'
+                Label:
+                    text: noti #muestra el texto de la noticia
+        BoxLayout:
+            Button:
+                text:'Volver'
+                on_release:
+                    root.manager.transition: 'right'
+                    root.volverBtnIn()
