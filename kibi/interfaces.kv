@@ -1,7 +1,7 @@
 <LoginWindow>:
     name: "login"
     legajo: legajo
-    contrasena: contrasena 
+    password: password
     GridLayout:
         rows:3
         padding:50,50
@@ -20,7 +20,7 @@
             Label:
                 text:'contrsena'
             TextInput:
-                id: contrasena
+                id: password
                 password: True
         BoxLayout:
             orientation:'horizontal'
@@ -28,7 +28,7 @@
                 text:'Ingresar'
                 on_release:
                     root.manager.transition.direction='left'
-                    root.login()
+                    root.login(legajo.text,password.text)
             Button:
                 text:'Registrarse'
                 on_release:
@@ -111,7 +111,7 @@
                 text: "Aceptar"
                 on_release:
                     root.manager.transition.direction = "left"
-                    root.aceptar()
+                    root.cargarUsuario(legajoReg.text,nombreReg.text,apellidoReg.text,emailReg.text,contrasenaReg.text,contrasena2Reg.text)
 
 
 
@@ -128,49 +128,22 @@
             orientation:'vertical'
             GridLayout:
                 cols:3
-                padding:15,15
-                Button:
-                    text:'Mapa'
-                    on_release:
-                        root.manager.transition.direction='left'
-                        root.mapaBtn()
-                
+                padding:15,15               
                 Button:
                     text:'Materias'
                     on_release:
                         root.manager.transition.direction='left'
-                        root.materiasBtn()
-                    
+                        root.materiasBtn()                    
                 Button:
                     text:'Editar materias'
                     on_release:
                         root.manager.transition.direction='left'
                         root.editarMateriasBtn()
-
-                Button:
-                    text:'Consultas'
-                    on_release:
-                        root.manager.transition.direction='left'
-                        root.consultasBtn()
-
-                Button:
-                    text:'Bibliografía'
-                    on_release:
-                        root.manager.transition.direction='left'
-                        root.bibliografiaBtn()         
-
                 Button:
                     text:'Editar perfil'
                     on_release:
                         root.manager.transition.direction='left'
                         root.editarPerfilBtn()
-
-                Button:
-                    text:'Noticias'
-                    on_release:
-                        root.manager.transition.direction='left'
-                        root.noticiasBtn()
-
         BoxLayout:
             orientation: 'horizontal'
             Button:
@@ -217,10 +190,12 @@
 <Materias>:
     name:'mat'
     #varaibles
-    GridLayout:
-        cols:3
-        Button:
-            text:'botones'
+    BoxLayout:
+        orientation:'horizontal'
+        GridLayout:
+            cols:3
+            Button:
+                text:'botones'
 
 <Consulta>:
     name:'con'
