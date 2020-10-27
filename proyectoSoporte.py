@@ -1,7 +1,6 @@
-from main2 import LoginWindow
 from typing import final
-from sqlalchemy import Column, String, Integer, ForeignKey,Date,Time
 import sqlalchemy
+from sqlalchemy import Column, String, Integer, ForeignKey,Date,Time
 from sqlalchemy.orm import relationship,backref
 from sqlalchemy.sql.sqltypes import Boolean
 from sqlalchemy.ext.declarative import declarative_base
@@ -22,7 +21,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 
-#importar de archivo Datos.py las tablas
+#from Datos import ...
 
 Base= declarative_base()
 global USER
@@ -42,7 +41,7 @@ class Datos(object):
 
 class User(Base):
     __tablename__='users'
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False))
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     nombre = Column(String)
     apellido = Column(String)
     email = Column(String)
@@ -122,6 +121,8 @@ class Modulo(Base):
         self.horarioFin = horaFin
         self.dia=dia
         self.aula=aula
+
+'''Falta clase alumno materia'''
 #--------------------------------------------------------------------------------------------------------
 class Error(Popup):
     error= BoxLayout(orientation='vertical')
@@ -172,7 +173,7 @@ class LoginWindow(Screen):
         if (usu!='' and psw!=''):
             x = self.datos.validaUsuario(usu,psw) #validar usuario en tabal usuarios
             if not (x==0):
-                global us
+                #global us
                 us= str(x[0].usuario)
                 sm.current= 'mp'
             else:
@@ -181,6 +182,9 @@ class LoginWindow(Screen):
         else:
             er= Error('Complete todos los campos', title='Error',size_hint=(None,None),size=(600,200))
             er.open()
+    
+    def registroBtn(self):
+        sm.current = 'registro'
 
 class RegistroWindow(Screen):
     legajoReg = ObjectProperty(None)
@@ -203,7 +207,9 @@ class RegistroWindow(Screen):
         else:
             er= Error('Complete todos los campos', title='Error',size_hint=(None,None),size=(600,200))
             er.open()
-            
+    def volver_login(self):
+        sm.current = 'login'
+
 class MenuPrincipal(Screen):
 
     def materiasBtn(self):
@@ -220,17 +226,16 @@ class MenuPrincipal(Screen):
         pass
 
 class AgregarMateria(Screen):
-    cont=0
-    m1=ObjectProperty(None)
-    c1=ObjectProperty(None)
+    #cont=0
+    #m1=ObjectProperty(None)
+    #c1=ObjectProperty(None)
+    pass
 
     
-class Materias(Screen):#
-
+class Materias(Screen):#generar dinamicamente la lista de  materias a las que se puede inscribir el alumno
     pass
 
-class InfoMateria(Screen):
-    pass
+class InfoMateria(Screen):#mostrar informacion de una materia
 
     def volverBtnIm(self):
         sm.current='mat'
@@ -243,6 +248,34 @@ class EditarPerfil(Screen):#traer de la base de datos los datos del perfil, pone
 
     def confirmarBtnEp(self):
         sm.current='mp'
+
+class SeleccionarMateria(Popup):
+    seleccionMateria=BoxLayout(orientation='vertical')
+    def __init__(self, **kwargs):
+        seleccionMateria=BoxLayout(orientation='vertical')
+        super(Popup, self).__init__(**kwargs)
+        self.add_widget(self.root)
+
+    def buscarMaterias(self):
+        materias_a_inscribir = Materia.buscar_materias()
+        return materias_a_inscribir
+
+class SeleccionarComision(Popup):
+    def __init__(self, **kwargs):
+        super(Popup, self).__init__(**kwargs)
+        self.add_widget(self.root)
+
+    def buscarComisionMateria(self):#buscar una comision perteneciente a una materia
+        pass
+
+class InfoMateria(Popup):
+    def __init__(self, **kwargs):
+        super(Popup, self).__init__(**kwargs)
+        self.add_widget(self.root)
+
+    def mostrarInformacionMateria(self):#muestra la informacion de una materia
+        pass
+    
 
 #----------------------------------------------------------------------------------------------------
 kivy.require("1.11.0")

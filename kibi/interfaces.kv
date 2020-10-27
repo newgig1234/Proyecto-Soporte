@@ -1,3 +1,7 @@
+#<SeleccionarComision>:
+
+#<SeleccionarMateria>:
+
 <LoginWindow>:
     name: "login"
     legajo: legajo
@@ -103,17 +107,15 @@
             orientation:'horizontal'
 
             Button:
-                text: "Ya tienes cuenta? volver al login"               
+                text: "Atras"               
                 on_release:
                     root.manager.transition.direction = "right"
-                    root.login()
+                    root.volver_login()
             Button:
                 text: "Aceptar"
                 on_release:
                     root.manager.transition.direction = "left"
                     root.cargarUsuario(legajoReg.text,nombreReg.text,apellidoReg.text,emailReg.text,contrasenaReg.text,contrasena2Reg.text)
-
-
 
 <MenuPrincipal>:
     name:'mp'
@@ -163,8 +165,7 @@
         BoxLayout:
             oriantation:'horizontal'
             Label:
-                text:'Menu Principal'
-        RVmaterias:    
+                text:'Menu Principal'   
         BoxLayout:
             oriantation:'horizontal'
             Button:
@@ -180,13 +181,6 @@
                     root.manager.transition: 'right'
                     root.aceptarBtn()
 
-<RVmaterias>:
-    data:[]
-    viewclass: 'Button'
-    RecycleBoxLayout:
-        #parametros
-        orientation:'horizontal'
-
 <Materias>:
     name:'mat'
     #varaibles
@@ -197,30 +191,6 @@
             Button:
                 text:'botones'
 
-<Consulta>:
-    name:'con'
-    #variables
-    consultaC: consultaC
-    BoxLayout:
-        orientation:'vertical'
-        GridLayout:
-            rows:5
-            Label:
-                text:'Logo'#agregar Logo
-            Label:
-                text:'Nombre de materia'# deberia ser una variable que recupere de la bd
-            BoxLayout:
-                orientation:'horizontal'
-                TextInput:
-                    id:consultaC
-            Button:
-                text:'Enviar'
-                on_release:
-            Button:
-                text:'Atras'
-                on_release:
-                    root.manager.transition: 'right'
-                    root.btnVolverCon()
 
 <InfoMateria>:
     name:'im'
@@ -299,113 +269,3 @@
                     on_release:
                         root.manager.transition: 'right'
                         root.confirmarBtnEp()
-
-
-<Mapa>:
-    name:'mp'
-    BoxLayout:
-        orientation:'vertical'
-        BoxLayout:
-            Label:
-                text:'Imagen'#Logo
-        BoxLayout:
-            Label:
-                text: 'Número de piso'
-        BoxLayout:
-            padding:10,0
-            #Ver si se puede agregar screen que vaya pasando de imagen en imagen y cambie el numeor de piso
-        BoxLayout:
-            orientation:'horizontal'
-            Button:
-                text:'<-'
-                on_release:
-                    root.manager.transition: 'left'
-                    root.backBtnMp()
-            Button:
-                text:'Atras'
-                on_release:
-                    root.manager.transition: 'left'
-                    root.atrasBtnMp()
-            Button:
-                text:'->'
-                on_release:
-                    root.manager.transition: 'right'
-                    root.nextBtnMp()
-    
-<Noticias>: 
-    name:'not'
-    listaNots: listaNots
-    BoxLayout:
-        orientation:'vertical'
-        Label:
-            text:'Notificaciones'
-#         BoxLayout:
-#             orientation:'horizontal'
-#             Button:
-#                 text: 'Mis Noticias'
-#                 on_release:
-#                     root.manager.transition: 'right'
-#                     #root.
-#             Button:
-#                 text: 'Noticias Generales'
-#                 on_release:
-#                     root.manager.transition: 'right'
-#                     #root.
-        BoxLayout:
-            orientation:'vertical'
-            NotRV:
-
-
-<misNoticias>:
-    orientation:'horizontal'
-    data:[]
-    GridLayout:
-        rows:2
-        Label:
-            text:'Materia'   
-        Label:
-            text:'Asunto'
-    Button:
-        text:'Ir'
-        on_release:
-            root.manager.transition:'right'
-            root.irBtn()
-
-<NotRV>:
-    data:[]
-    viewclass:'misNoticias'
-    RecycleBoxLayout:
-        #parametros
-        orientation:'horizontal'
-
-
-<InfoNoticia>:
-    name:'in'
-    #variables
-    nm:nombreMateria
-    asunto: asunto
-    noti: noti
-    BoxLayout:
-        orientation:'vertical'
-        BoxLayout:
-            padding: 10,10
-            GridLayout:
-                cols:2
-                Label:
-                    text: 'Materia: '
-                Label:
-                    text:nombreMateria
-                Label:
-                    text:'Asunto:'
-                Label:
-                    text: asunto
-        BoxLayout:
-            orientation:'vertical'
-                Label:
-                    text: noti #muestra el texto de la noticia
-        BoxLayout:
-            Button:
-                text:'Volver'
-                on_release:
-                    root.manager.transition: 'right'
-                    root.volverBtnIn()
