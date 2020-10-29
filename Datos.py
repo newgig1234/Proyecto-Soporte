@@ -1,19 +1,14 @@
 #from typing import final
 import sqlalchemy
 from sqlalchemy import Column, String, Integer, ForeignKey,Date,Time,MetaData
-from sqlalchemy.orm import backref, relationship, sessionmaker
-#from sqlalchemy.orm.relationships import foreign
-from sqlalchemy.sql.sqltypes import Boolean, DateTime, INTEGER
-from sqlalchemy.sql.schema import Table 
+from sqlalchemy.orm import  relationship, sessionmaker
+from sqlalchemy.sql.sqltypes import  DateTime, INTEGER
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker,scoped_session
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 
-engine= create_engine('sqlite:///datos.db', echo=True)
 Base = declarative_base()
-Session=sessionmaker(bind=engine)
-db=scoped_session(Session)
 
 class Alumno(Base):
     __tablename__='alumnos'
@@ -22,10 +17,11 @@ class Alumno(Base):
     apellido = Column(String)
     email = Column(String)
     legajo = Column(INTEGER,nullable=False) #id login
-    #username = Column(String, nullable=False)
     password = Column(String, nullable=False)
 
-    clases = relationship('Clases', secondary='alumnocomisionmateria', backref='alumnos')
+    clases = relationship('Comision', secondary='alumnocomisionmateria', backref='alumnos')#problema
+    comision = relationship('Materia', secondary='alumnocomisionmateria', backref='alumnos')#problema
+
 
     def __repr__(self):
         return f'User {self.name} {self.surname}'
@@ -33,31 +29,29 @@ class Alumno(Base):
     def validarUsuario(self,leg,psw):
         val=None
         try:
-            conn = engine.connect()
-            val = self.db.query(Alumno).filter(Alumno.legajo == leg and Alumno.password == psw).fetchone()
+            conn = crearConexion()
+            val = conn.query(Alumno).filter(Alumno.legajo == leg and Alumno.password == psw).fetchone()
         except SQLAlchemyError as e:
             error = str(e.__dict__['orig'])
             val= None
             print(error)
         finally:
-            conn.close()
+            cerrarConexion(conn)
             return val
     
     def altaUsusario(self,entrada):
-        # self.legajo = leg
-        # self.nombre = nom
-        # self.apellido = app
-        # self.email = mail
-        # self.password = psw
+        conn =None
         try:
-            conn = engine.connect()
-            self.session.add(entrada)
-            self.session.commit()
+            conn = crearConexion()
+            conn.add(entrada)
+            conn.commit()
+            q = conn.query(Alumno).filter(Alumno.id == entrada.id).fetchone()
         except SQLAlchemyError as e:
             error = str(e.__dict__['orig'])
             print(error) 
         finally:
-            conn.close()
+            cerrarConexion(conn)
+            return q
 
 class Materia(Base):
     __tablename__ = 'materias'
@@ -70,6 +64,7 @@ class Materia(Base):
 
     comision= relationship('Comision',secondary='comisionmateria')
 
+
     def __init__(self,nombreMateria,año,profesor,email_profesor,tipoMateria):
         self.nombreMateria = nombreMateria
         self.añoCursado = año
@@ -80,15 +75,19 @@ class Materia(Base):
     def __repr__(self):
         return f'materia {self.nombreMateria}'
 
-    def agregarMateria(self):
-        pass
-
-    def buscarMateria(self):#buscar als materias para hacer el popup
-        pass
-
+    def traerMaterias(self):
+        q=None
+        try:
+            conn = crearConexion()
+            q = conn.query(Materia).all()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            print(error)
+        finally:
+            cerrarConexion(conn)
+            return q
 
 class Comision(Base):
-    #cambiar en md
     __tablename__ = 'comisiones'
     id = Column(INTEGER, primary_key=True, autoincrement=True, nullable=False)
     descripcion = Column(String)
@@ -105,27 +104,57 @@ class Comision(Base):
         pass
 
 
+
 class AlumnoComisionMateria(Base):
     __tablename__='alumnocomisionmateria'
     alumno_id=Column(INTEGER,ForeignKey('alumnos.id'),primary_key=True)
     comision_materia_id=Column(INTEGER,ForeignKey('comisionmateria.comision_materia_id'),primary_key=True)
     
-    alumno=relationship('Alumnos',back_populates='alumnos')
+    alumno=relationship('Alumno',back_populates='alumnos')
     comisionMateria=relationship('ComisionMaterias',back_populates='comisionmateria')
+
+    alumnos = relationship('Materia', secondary='comisionmateria', backref='alumnocomisionmateria')
+    alumnos = relationship('Comision', secondary='comisionmateria', backref='alumnocomisionmateria')
 
     def __repr__(self):
         pass
 
-    def traerMateriasAlumno(self,alu):
+
+    def alta(self,entrada):
         try:
-            conn = engine.connect()
-            q = self.session.query(AlumnoComisionMateria.comisionMateria).filter(AlumnoComisionMateria.alumno.id == alu.id).all()
+            conn = crearConexion()
+            conn.add(entrada)
+            conn.commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            print(error) 
+        finally:
+            cerrarConexion(conn)
+            return True
+
+    def traerMateriasAlumno(self,alu):
+        q=None
+        try:
+            conn = crearConexion()
+            q = conn.query(AlumnoComisionMateria.comisionMateria).filter(AlumnoComisionMateria.alumno.id == alu.id).all()
         except SQLAlchemyError as e:
             error = str(e.__dict__['orig'])
             print(error)
         finally:
-            conn.close()
+            cerrarConexion(conn)
             return q
+    
+    def bajaMateria(self,a,cm):
+        try:
+            conn = crearConexion()
+            conn.query(AlumnoComisionMateria).filter(AlumnoComisionMateria.alumno.id == a.id and AlumnoComisionMateria.comisionMateria.comision_materia_id == cm.comision_materia_id).delete()
+            conn.commit()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            print(error)
+        finally:
+            cerrarConexion(conn)
+            return True
 
 
 class ComisionMateria(Base):
@@ -142,10 +171,10 @@ class ComisionMateria(Base):
     aulaPractica = Column(String, nullable=True)
     fechaInscripcion=Column(DateTime)
 
-    comision=relationship('Materia',back_populates='comisiones')
+    comision=relationship('Materia',back_populates='comision')
     materia=relationship('Comision',back_populates='materias')
 
-    alumnos = relationship('Alumnos', secondary='alumnocomisionmateria', backref='comisionmateria')
+    alumnos = relationship('Alumno', secondary='alumnocomisionmateria', back_populates='comisionmateria')
 
 
     def __init__(self,horaT='7:00-9:00',diaT='Lunes',aulaT='404',horaP='9:00-11:00',diaP='Martes',aulaP='505'):
@@ -160,16 +189,64 @@ class ComisionMateria(Base):
         return f'Clase {self.comision_id}{self.materia_id} Teoria {self.diaTeoria} {self.horarioTeoria} Practica {self.diaPractica}{self.horarioPractica}'
 
     def infoMat(self,cm):
+        nm=nc=None
         try:
-            conn = engine.connect()
-            nm = self.session.query(ComisionMateria.materia.nombreMateria).filter(ComisionMateria.materia_id == cm.materia_id).fetchone()
-            nc = self.session.query(ComisionMateria.comision.descripcion).filter(ComisionMateria.comision_id == cm.comision_id).fetchone()
+            conn = crearConexion()
+            nm = conn.query(ComisionMateria.materia.nombreMateria).filter(ComisionMateria.materia_id == cm.materia_id).fetchone()
+            nc = conn.query(ComisionMateria.comision.descripcion).filter(ComisionMateria.comision_id == cm.comision_id).fetchone()
         except SQLAlchemyError as e:
             error = str(e.__dict__['orig'])
             print(error)
         finally:
-            conn.close()
+            cerrarConexion(conn)
             return nm,nc
+    
+    def traerComisiones(self,m):
+        q=None
+        try:
+            conn = crearConexion()
+            q = conn.query(Comision).filter(ComisionMateria.materia_id==m.id and ComisionMateria.comision_id == Comision.id).all()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            print(error)
+        finally:
+            cerrarConexion(conn)
+            return q
+    
+    def devolver(self,m,c):
+        q=None
+        try:
+            conn = crearConexion()
+            q = conn.query(ComisionMateria).filter(ComisionMateria.materia_id==m.id and ComisionMateria.comision_id == Comision.id).fetchone()
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+            print(error)
+        finally:
+            cerrarConexion(conn)
+            return q
 
 
-Base.metadata.create_all(engine)
+def crearConexion():
+    engine=create_engine('sqlite:///datos.db', echo=True)
+    Base.metadata.bind=engine
+    db_session=sessionmaker()
+    db_session.bind=engine
+    session=db_session()
+    return session
+
+def crearTablas():
+    engine=create_engine('sqlite:///datos.db')
+    meta=MetaData()
+    #Base=declarative_base()
+    meta.create_all(engine)
+
+def cerrarConexion(sess):
+    error='Session Cerrada'
+    try:
+        sess.close()
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        print(error)
+    finally:
+        return error
+

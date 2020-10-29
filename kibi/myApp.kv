@@ -133,15 +133,10 @@
                         root.manager.transition.direction='left'
                         root.materiasBtn()                    
                 Button:
-                    text:'Editar materias'
+                    text:'Agregar Materia'
                     on_release:
                         root.manager.transition.direction='left'
-                        root.editarMateriasBtn()
-                Button:
-                    text:'Editar perfil'
-                    on_release:
-                        root.manager.transition.direction='left'
-                        root.editarPerfilBtn()
+                        root.agregarMateriaBtn()
         BoxLayout:
             orientation: 'horizontal'
             Button:
@@ -151,31 +146,31 @@
                     root.manager.transition.direction='right'
                     root.logOut()
 
-<AgregarMateria>:
-    name:'am'
-    #variables
-    mat1:mat1
-    com1:com1
-    GridLayout:
-        rows:3
-        BoxLayout:
-            oriantation:'horizontal'
-            Label:
-                text:'Menu Principal'   
-        BoxLayout:
-            oriantation:'horizontal'
-            Button:
-                text:'Omitir'
-                padding:10
-                on_release:
-                    root.manager.transition: 'left'
-                    root.omitirBtn()
-            Button:
-                text:'Aceptar'
-                padding:10
-                on_release:
-                    root.manager.transition: 'right'
-                    root.aceptarBtn()
+# <AgregarMateria>:
+#     name:'am'
+#     #variables
+#     mat1:mat1
+#     com1:com1
+#     GridLayout:
+#         rows:3
+#         BoxLayout:
+#             oriantation:'horizontal'
+#             Label:
+#                 text:'Menu Principal'   
+#         BoxLayout:
+#             oriantation:'horizontal'
+#             Button:
+#                 text:'Omitir'
+#                 padding:10
+#                 on_release:
+#                     root.manager.transition: 'left'
+#                     root.omitirBtn()
+#             Button:
+#                 text:'Aceptar'
+#                 padding:10
+#                 on_release:
+#                     root.manager.transition: 'right'
+#                     root.aceptarBtn()
 
 # <Materias>:
 #     name:'mat'
@@ -188,80 +183,39 @@
 #                 text:'botones'
 
 
-<InfoMateria>:
-    name:'im'
-    noMat: noMat
-    diasCur: diasCur
-    horasCur: horasCur
-    aulaCur: aulaCur
-    #variables
-    BoxLayout:
-        orientation:'vertical'
-        BoxLayout:
-            padding: 10,10
-            GridLayout:
-                orientation: 'vertical'
-                cols:2
-                Label:
-                    text:'Nombre materia: '
-                Label:
-                    text: noMat
-                Label:
-                    text:'Dias cursado: '
-                Label:
-                    text: diasCur
-                Label:
-                    text:'Horarios cursado: '
-                Label:
-                    text: horasCur
-                Label:
-                    text:'Aula cursado: '
-                Label:
-                    text: aulaCur
-        BoxLayout:
-            Button:
-                text:'Volver'
-                on_release:
-                    root.manager.transition: 'right'
-                    root.volverBtnIm()
-
-<EditarPerfil>:
-    name:'ed'
-    #variables
-    nombreEP:nombreEP
-    apellidoEP:apellidoEP
-    emailEP:emailEP
-    contrasenaEP:contrasenaEP
-    repcontrasenaEP:repContrasenaEP
-    contrasenaActualEP:contrasenaActualEP
-
-    BoxLayout:
-        GridLayout:
-            rows:7
-            TextInput:
-                text:nombreEP
-            TextInput:
-                text:apellidoEP
-            TextInput:
-                text:emailEP
-            TextInput:
-                text:contrasenaEP
-                password:True
-            TextInput:
-                text:repContrasenaEP
-                password:True
-            TextInput:
-                text:contrasenaActualEP
-                password:True
-            BoxLayout:
-                orientation:'Horizontal'
-                Button:
-                    text:'Volver'
-                    on_release:
-                        root.manager.transition: 'right'
-                        root.volverBtnEp()
-                Button:
-                    text:'Confirmar'
-                    on_release:
-                        root.manager.transition: 'right'
-                        root.confirmarBtnEp()
+# <InfoMateria>:
+#     name:'im'
+#     noMat: noMat
+#     diasCur: diasCur
+#     horasCur: horasCur
+#     aulaCur: aulaCur
+#     #variables
+#     BoxLayout:
+#         orientation:'vertical'
+#         BoxLayout:
+#             padding: 10,10
+#             GridLayout:
+#                 orientation: 'vertical'
+#                 cols:2
+#                 Label:
+#                     text:'Nombre materia: '
+#                 Label:
+#                     text: noMat
+#                 Label:
+#                     text:'Dias cursado: '
+#                 Label:
+#                     text: diasCur
+#                 Label:
+#                     text:'Horarios cursado: '
+#                 Label:
+#                     text: horasCur
+#                 Label:
+#                     text:'Aula cursado: '
+#                 Label:
+#                     text: aulaCur
+#         BoxLayout:
+#             Button:
+#                 text:'Volver'
+#                 on_release:
+#                     root.manager.transition: 'right'
+#                     root.volverBtnIm()

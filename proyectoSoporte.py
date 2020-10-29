@@ -1,8 +1,5 @@
 import kivy
 from kivy.app import App
-from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
@@ -12,7 +9,8 @@ from kivy.uix.textinput import TextInput
 from sqlalchemy.sql.elements import Null
 
 from Datos import Alumno,Materia,Comision,AlumnoComisionMateria,ComisionMateria
-
+kivy.require("1.11.0")
+#--------------------------------------------------------------------------------------
 class Error(Popup):
     error= BoxLayout(orientation='vertical')
     def __init__(self,msj, **kwargs):
@@ -36,7 +34,6 @@ class Exito(Popup):
     exito= BoxLayout(orientation='vertical')
     def __init__(self,msj, **kwargs):
         exito = BoxLayout(orientation="vertical")
-        #super(Popup, self).__init__(**kwargs)
         self.add_widget(exito)
         self.exito = exito
         self.construir(msj)
@@ -52,192 +49,342 @@ class Exito(Popup):
         self.dismiss()
 
 class MostrarMaterias(Popup):
-    mostrar_materia= BoxLayout(orientation='vertical')
-    def __init__(self, **kwargs):
-        pass
 
-    def construir(self):
-        mensaje = Label(text = 'MIS MATERIAS')
-        self.add_widget(mensaje)
-        mostrar_materia_Gridlayout = GridLayout(col=1)
-        self.add_widget(mostrar_materia_Gridlayout)
-        mats = self.AlumnoComisionMateria.traerMateriasAlumno(us)
+    def build(self,u):
+        self.construir(u)
+        self.open()
+
+    def construir(self,u):
+        box= BoxLayout(orientation='vertical',padding=10)
+        box.clear_widgets()
+        gLayout= GridLayout(cols=1,padding=10)
+        gLayout.clear_widgets()
+        mats = AlumnoComisionMateria().traerMateriasAlumno(u)
+        mi = MostrarInformacion()
         for matcom in mats:
             btn = Button(text = matcom.materia.nombreMateria)
-            mi = MostrarInformacion()
-            btn.bind(on_release=mi.construir(matcom))
-            self.mostrar_materia_Gridlayout.add_widget(btn)
-        volver = Button(text='Atras')
-        volver.bind(on_release=self.cerrar)
-        self.mostrar_materia_Gridlayout.add_widget(volver)
+            btn.bind(on_release=mi.build(matcom,u))
+            gLayout.add_widget(btn)
+        btnVolver = Button(text='Atras')
+        btnVolver.bind(on_release=self.cerrar())
+        box.add_widget(gLayout)
+        box.addwidget(btnVolver)
+        pop=Popup(Title='Mis Materias',content=box,padding=5)
+        return pop
         
-    def cerrar(self,ev):
+    def cerrar(self):
         self.dismiss()
 
 class MostrarInformacion(Popup):
-    def __init__(self, **kwargs):
-        pass
         
-    def cosntruir(self,matcom):
-        box= BoxLayout(orientation='verticla')
-        mensaje= Label(text='INFORMACION MATERIA')#modificar altura
-        box.add_widget(mensaje)
-        mostrar_informacion_Gridlayout = GridLayout(Col=8)# no lo toma
-        box.add_widget(mostrar_informacion_Gridlayout)
-        nm,nc = self.ComisionMateria.infoMat(matcom)
-        nombreMateria = Label(text=nm)
-        numComision = Label(text=nc) 
+    def construir(self,matcom,u):
+        box= BoxLayout(orientation='vertical')
+        box.clear_widgets()
+        gLayout=GridLayout(cols=2,padding=5)
+        gLayout.clear_widgets()
+        nomMateria,numeroComision = self.ComisionMateria.infoMat(matcom)
+        btnBaja= Button(text='Darse de baja de una materia')
+        btnBaja.bind(on_release=self.darBajaMaeteria(matcom,u))
+        mm = MostrarMaterias()
+        btnAtras=Button(text='Volver')
+        btnAtras.bind(on_release=mm.build(u))
+        nom=Label(text='Nombre')
+        num=Label(text='Numero Comision')
+        ht=Label(text='Hora Teoria')
+        dt=Label(text='Dia Teoria')
+        at=Label(text='Aula Teoria')
+        hp=Label(text='Hora Practica')
+        dp=Label(text='Dia Practica')
+        ap=Label(text='Aula Practica')
+        nombreMateria = Label(text=nomMateria.nombre)
+        numComision = Label(text=numeroComision) 
         horaT = Label(text=matcom.horarioTeoria)
         diaT = Label(text=matcom.diaTeoria)
-        aulaT= Label(text=matcom.aulaTeoria)
-        horaP= Label(text=matcom.horaPractica)
-        diaP= Label(text=matcom.diaPractica)
-        aulaP=  Label(text=matcom.aulaPractica)
-        self.mostrar_informacion_Gridlayout.add_widget(nombreMateria)
-        self.mostrar_informacion_Gridlayout.add_widget(numComision)
-        self.mostrar_informacion_Gridlayout.add_widget(horaT)
-        self.mostrar_informacion_Gridlayout.add_widget(diaT)
-        self.mostrar_informacion_Gridlayout.add_widget(aulaT)
-        self.mostrar_informacion_Gridlayout.add_widget(horaP)
-        self.mostrar_informacion_Gridlayout.add_widget(diaP)
-        self.mostrar_informacion_Gridlayout.add_widget(aulaP)
+        aulaT = Label(text=matcom.aulaTeoria)
+        horaP = Label(text=matcom.horaPractica)
+        diaP = Label(text=matcom.diaPractica)
+        aulaP =  Label(text=matcom.aulaPractica)
+        gLayout.add_widget(nom)
+        gLayout.add_widget(nombreMateria)
+        gLayout.add_widget(num)
+        gLayout.add_widget(numComision)
+        gLayout.add_widget(ht)
+        gLayout.add_widget(horaT)
+        gLayout.add_widget(dt)
+        gLayout.add_widget(diaT)
+        gLayout.add_widget(at)
+        gLayout.add_widget(aulaT)
+        gLayout.add_widget(hp)
+        gLayout.add_widget(horaP)
+        gLayout.add_widget(dp)
+        gLayout.add_widget(diaP)
+        gLayout.add_widget(ap)
+        gLayout.add_widget(aulaP)
+        box.add_widget(gLayout)
+        box.add_widget(btnAtras)
+        box.add_widget(btnBaja)
+        pop= Popup(Title='Mostrar Informacion',content=box,padding=10)
+        return pop
 
+     
+    def build(self,mc,u):
+        self.construir(mc,u)
+        self.open()
 
-class WindowManager(ScreenManager):
-    pass
-
-class LoginWindow(Screen):
-    legajo = ObjectProperty()
-    password = ObjectProperty()
-
-    def login(self,usu,psw):
-        if (usu!='' and psw!=''):
-            x = self.Alumno.validaUsuario(usu,psw) #validar usuario en tabal usuarios
-            if (x):
-                global us
-                us = x
-                #us= str(x[0].usuario)
-                sm.current= 'mp'
-            else:
-                er= Error('Usuario y/o contrasena incorrecta', title='Error',size_hint=(None,None),size=(600,200))
-                er.open()
-                sm.current= 'login'
+    def darBajaMaeteria(self,mc,u):
+        amc = AlumnoComisionMateria().bajaMateria(u,mc)
+        if amc == True:
+            ex= Exito('Se elimino la materia de su lista correctamente.',title='Exito',size_hint=(None,None),size=(600,200))
+            ex.open()
+            ex.dismiss()
+            mm = MostrarMaterias()
+            mm.build(u)
         else:
-            er= Error('Complete todos los campos', title='Error',size_hint=(None,None),size=(600,200))
+            er= Error('No se pudo eliminar la materia de su lista, por favor intente nuevamente.', title='Error',size_hint=(None,None),size=(600,200))
             er.open()
-            sm.current= 'login'
-    
-    def registroBtn(self):
-        sm.current = 'registro'
+            er.dismiss()
 
-class RegistroWindow(Screen):
-    legajoReg = ObjectProperty(None)
-    nombreReg = ObjectProperty(None)
-    apellidoReg = ObjectProperty(None)
-    emailReg = ObjectProperty(None)
-    constrasenaReg = ObjectProperty(None)
-    contrasena2Reg = ObjectProperty(None)
+class loginPopup(Popup):
     
-    def cargarUsuario(self,leg,nom,app,mail,cont1,cont2):
+    def build(self):
+        self.construir()
+        self.open()
+
+    def construir(self):
+        box= BoxLayout(orientation='vertical', padding=5)
+        txt= Label(text='Login')
+        gLayout=GridLayout(cols=2, padding=10)
+        txtUser=Label(text='Usuario')
+        txtPsw=Label(text='Contrasena')
+        txtIUser= TextInput(multiline=False)
+        txtIPsw= TextInput(multiline=False, password=True)
+        btn= Button(text='Ingresar')
+        btn.bind(on_release=self.controlLogin(txtIUser,txtIPsw))#funcion para logear
+        btnR=Button(text='Registrarse')
+        btnR.bind(on_release=self.irRegistro())#boton REgistro
+        gLayout.add_widget(txtUser)
+        gLayout.add_widget(txtIUser)
+        gLayout.add_widget(txtPsw)
+        gLayout.add_widget(txtIPsw)
+        box.add_widget(txt)
+        box.add_widget(gLayout)
+        box.add_widget(btn)
+        pop = Popup(title='Login',content=box, padding=5)
+        return pop
+
+    def irRegistro(self):
+        reg = registroPop()
+        reg.build()
+    
+    def controlLogin(self,usu,psw):
+        if (usu!='' and psw!=''):
+            a= Alumno()
+            x = a.validarUsuario(usu,psw) #validar usuario en tabal usuarios
+            if (x != {}):#ver que onda esto
+                mp = MenuPrincipal()
+                mp.build(x)
+            else:
+                er = Error('Usuario y/o contrasena incorrecta', title='Error',size_hint=(None,None),size=(600,200))
+                er.open()
+                log = loginPopup()
+                log.build()
+        else:
+            er = Error('Complete todos los campos', title='Error',size_hint=(None,None),size=(600,200))
+            er.open()
+
+class MenuPrincipal(Popup):
+
+    def build(self,us):
+        self.construir(us)
+        self.open()
+
+    def construir(self,u):
+        box= BoxLayout(orientation='vertical',padding=5)
+        txt= Label(text='Menu Principal')
+        gLayout= GridLayout(cols=1, padding=5)
+        btnMaterias= Button(text='Materias')
+        btnAgregarMaterias=Button(text='Agregar Materias')
+        btnSalir=Button(text='Salir')
+        btnMaterias.bind(on_release=self.mostrarMaterias(u))
+        btnAgregarMaterias.bind(on_release=self.agregarMateria(u))
+        btnSalir.bind(on_release=None)
+        gLayout.add_widget(btnMaterias)
+        gLayout.add_widget(btnAgregarMaterias)
+        gLayout.add_widget(btnSalir)
+        box.add_widget(txt)
+        box.add_widget(gLayout)
+        pop= Popup(title='Menu Principal',content=box,padding=5)
+        return pop
+
+    def mostrarMaterias(self,u):
+        mm= MostrarMaterias()
+        mm.build(u)
+
+    def agregarMateria(self,u):
+        ss= SeleccionarMateria()
+        ss.build(u)
+
+class registroPop(Popup):
+    def build(self):
+        self.construir()
+        self.open()
+
+    def construir(self):
+        box= BoxLayout(orientation='vertical',padding=5)
+        gLayout= GridLayout(cols=2,padding=5)
+        txt= Label(text='Registro')
+        btnAceptar=Button(text='aceptar')
+        txtLegajo= Label(text='Legajo')
+        txtNombre= Label(text='Nombre')
+        txtApellido= Label(text='Apellido')
+        txtMail=Label(text='mail')
+        txtPsw1= Label(text='Contrasena')
+        txtPsw2= Label(text='Repetir Contrasena')
+        txtILegajo =TextInput(multiline=False)
+        txtINombre= TextInput(multiline=False)
+        txtIApellido= TextInput(multiline=False)
+        txtIMail=TextInput(multiline=False)
+        txtIPsw1= TextInput(password=True, multiline=False)
+        txtIPsw2= TextInput(password=True, multiline=False)
+        gLayout.add_widget(txtLegajo)
+        gLayout.add_widget(txtILegajo)
+        gLayout.add_widget(txtNombre)
+        gLayout.add_widget(txtINombre)
+        gLayout.add_widget(txtApellido)
+        gLayout.add_widget(txtIApellido)
+        gLayout.add_widget(txtMail)
+        gLayout.add_widget(txtIMail)
+        gLayout.add_widget(txtPsw1)
+        gLayout.add_widget(txtIPsw1)
+        gLayout.add_widget(txtPsw2)
+        gLayout.add_widget(txtIPsw2)
+        btnAceptar.bind(on_release=self.validarUsuario(txtILegajo,txtINombre,txtIApellido,txtIMail,txtIPsw1,txtIPsw2))#aca
+        box.add_widget(txt)
+        box.add_widget(gLayout)
+        box.add_widget(btnAceptar)
+        pop= Popup(title='Registro', content=box,padding=5)
+        return pop
+
+    def validarUsuario(self,leg,nom,app,mail,cont1,cont2):
         if(leg!='' or nom!='' or app!='' or mail!='' or cont1!='' or cont2!=''):
             if(cont1 == cont2):
-                self.Alumno.altaUsuario(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1)) #registrar ususario en tabal usuarios
+                usu = Alumno.altaUsuario(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1)) #registrar ususario en tabal usuarios
                 ex= Exito('Se registro el usuario con exito',title='Exito',size_hint=(None,None),size=(600,200))
                 ex.open()
-                sm.current='login'
+                mp = MenuPrincipal()
+                mp.build(usu)
             else:
-                er= Error('Las contraseñas son diferentes', title='Error',size_hint=(None,None),size=(600,200))
+                er= Error('Las contrasenas son diferentes', title='Error',size_hint=(None,None),size=(600,200))
                 er.open()
+                reg = registroPop()
+                reg.build()
         else:
             er= Error('Complete todos los campos', title='Error',size_hint=(None,None),size=(600,200))
             er.open()
-    def volver_login(self):
-        sm.current = 'login'
-
-class MenuPrincipal(Screen):
-
-    def materiasBtn(self):
-        mm = MostrarMaterias()
-        mm.construir()
-
-    def editarMateriasBtn(self):
-        sm.current='em'
-
-    def editarPerfilBtn(self):
-        sm.current='edp'
-
-    def logOut(self):
-        #confirmacionSalir()
-        pass
-
-class AgregarMateria(Screen):
-    #cont=0
-    #m1=ObjectProperty(None)
-    #c1=ObjectProperty(None)
-    pass
-
-    
-class Materias(Screen):#generar dinamicamente la lista de  materias a las que se puede inscribir el alumno
-    pass
-
-# class InfoMateria(Screen):#mostrar informacion de una materia
-#     def volverBtnIm(self):
-#         sm.current='mat'
-
-class EditarPerfil(Screen):#traer de la base de datos los datos del perfil, ponerlos en un text imput y si los queire cambiar que los cambie
-    pass
-
-    def volverBtnEp(self):
-        sm.current='mp'
-
-    def confirmarBtnEp(self):
-        sm.current='mp'
-
+   
 class SeleccionarMateria(Popup):
-    seleccionMateria=BoxLayout(orientation='vertical')
-    def __init__(self, **kwargs):
-        #seleccionMateria=BoxLayout(orientation='vertical')
-        #super(Popup, self).__init__(**kwargs)
-        self.add_widget(self.root)
 
-    def buscarMaterias(self):
-        #materias_a_inscribir = Materia.buscar_materias()
-        #return materias_a_inscribir
-        pass
+    def build(self,u):
+        self.construir(u)
+        self.open()
+
+    def construir(self,u):
+        box=BoxLayout(orientation='vertical', padding=10)
+        txt = Label(text ='MATERIAS')
+        gLayout= GridLayout(cols=1, padding=10)
+        mats = Materia.traerMaterias()
+        for mat in mats:
+            btn = Button(text = mat.nombreMateria)
+            btn.bind(on_release=self.confirmar(mat,u))
+            gLayout.add_widget(btn)
+        btnAtras=Button(text='Atras')
+        btnAtras.bind(on_release=self.cerrar())
+        box.add_widget(txt)
+        box.add_widget(gLayout)
+        box.add_widget(btnAtras)
+        pop = Popup(title='SelecionarMateria',content=box,padding=10)
+        return pop
+
+    def confirmar(self,m,u):
+        box = BoxLayout(orientation='vertical',padding=10)
+        gLayout= GridLayout(cols=2,row=1,padding=10)
+        txt= Label(text='¿Esta seguro que desea inscribirse a esta materia?')
+        btnAceptar = Button(text='Aceptar')
+        btnCancelar= Button(text='Cancelar')
+        btnAceptar.bind(on_release=self.selecCom(m,u))
+        btnCancelar.bind(on_release=self.creacion())
+        box.add_widget(txt)
+        gLayout.add_widget(btnCancelar)
+        gLayout.add_widget(btnAceptar)
+        box.add_widget=gLayout
+        pop = Popup(Title='Confirmar',content=box)
+        return pop
+
+    def selecCom(self,m,u):
+        sm = SeleccionarComision()
+        sm.build(m,u)
+        
+    def cerrar(self):
+        self.dismiss()
 
 class SeleccionarComision(Popup):
-    def __init__(self, **kwargs):
-        #super(Popup, self).__init__(**kwargs)
-        self.add_widget(self.root)
 
-    def buscarComisionMateria(self):#buscar una comision perteneciente a una materia
-        pass
+    def build(self,m,u):
+        self.construir(m,u)
+        self.open()
 
-class InfoMateria(Popup):
-    def __init__(self, **kwargs):
-        #super(Popup, self).__init__(**kwargs)
-        self.add_widget(self.root)
+    def construir(self,mat,u):
+        box= BoxLayout(orientation='horizontal',padding=10)
+        txt=Label(text='Seleccione Comision')
+        gLayout = GridLayout(cols=2,padding=10)
+        comis = ComisionMateria.traerComisiones(mat)
+        for com in comis:
+            btn=Button(text=com.descripcion)
+            btn.bind(on_release=self.confirmar(mat,com,u))
+            gLayout.add_widget(btn)
+        box.add_widget(txt)
+        box.add_widget(gLayout)
+        pop = Popup(title='Seleccionar Materia',content=box)
+        return pop
 
-    def mostrarInformacionMateria(self):#muestra la informacion de una materia
-        pass
+    def confirmar(self,m,c,u):
+        box= BoxLayout(orientation='vertical',padding=10)
+        txt= Label(text='¿Desea esta comision, Materia{materia}, Comision{comision}?'.format(materia=m.nombre,comision=c.detalle))
+        gLayout= GridLayout(cols=2,padding=10)
+        btnCancelar=Button(text='Cancelar')
+        btnCancelar.bind(on_release=self.creacion(m))#funcion boton cancelar
+        btnAceptar=Button(text='Aceptar')
+        btnAceptar.bind(on_release=self.altaACM(m,c,u))#funcion boton aceptar
+        box.add_widget(txt)
+        gLayout.add_widget(btnCancelar)
+        gLayout.add_widget(btnAceptar)
+        box.add_widget(gLayout)
+        pop=Popup(title='Confirmar',content=box)
+        return pop
     
+    
+    def altaACM(self,m,c,u):
+        cm = ComisionMateria.devolver(m,c)
+        res = AlumnoComisionMateria.alta(AlumnoComisionMateria(alumno_id=u.id,comision_materia_id=cm.comision_materia_id,alumno=u,comisionmateria=cm))
+        if res==True:
+            ex= Exito('¡Se agrego la materia con exito!',title='Exito',size_hint=(None,None),size=(600,200))
+            ex.open()
+            mp = MenuPrincipal()
+            mp.build(u)
+        else:
+            er= Error('No se pudo agregar la materia, intente nuevamente desde el comienzo.', title='Error',size_hint=(None,None),size=(600,200))
+            er.open()
+            mp = MenuPrincipal()
+            mp.build(u)
+            
 #----------------------------------------------------------------------------------------------------
-kivy.require("1.11.0")
-kv = Builder.load_file('interfaces.kv')
-sm = WindowManager()
-
-screens = [LoginWindow(name="login"), RegistroWindow(name="registro"), MenuPrincipal(name="mp"),
-            AgregarMateria(name='am'),Materias(name='mat'),InfoMateria(name='im'),EditarPerfil(name='ep'),]
-for screen in screens:
-    sm.add_widget(screen)
-
-sm.current = "login"
 
 us=Null
-class TpMainApp(App):
+class myAppApp(App):
     def build(self):
         self.title = 'TPI'
-        return sm
+        lp = loginPopup()
+        return lp.build()
 
 if __name__ == "__main__":
-    TpMainApp().run()
+    myAppApp().run()
