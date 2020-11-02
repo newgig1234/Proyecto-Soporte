@@ -59,12 +59,15 @@ class MostrarMaterias(Popup):
         box.clear_widgets()
         gLayout= GridLayout(cols=1,padding=10)
         gLayout.clear_widgets()
-        mats = AlumnoComisionMateria().traerMateriasAlumno(u)
+        acm= AlumnoComisionMateria()
+        mats= acm.traerMateriasAlumno(u)
+        #mats = AlumnoComisionMateria.traerMateriasAlumno(u)
         mi = MostrarInformacion()
-        for matcom in mats:
-            btn = Button(text = matcom.materia.nombreMateria)
-            btn.bind(on_release=mi.build(matcom,u))
-            gLayout.add_widget(btn)
+        if not(mats):
+            for matcom in mats:
+                btn = Button(text = matcom.materia.nombreMateria)
+                btn.bind(on_release=mi.build(matcom,u))
+                gLayout.add_widget(btn)
         btnVolver = Button(text='Atras')
         btnVolver.bind(on_release=self.cerrar())
         box.add_widget(gLayout)
@@ -82,7 +85,7 @@ class MostrarInformacion(Popup):
         box.clear_widgets()
         gLayout=GridLayout(cols=2,padding=5)
         gLayout.clear_widgets()
-        nomMateria,numeroComision = self.ComisionMateria.infoMat(matcom)
+        nomMateria,numeroComision = ComisionMateria.infoMat(matcom)
         btnBaja= Button(text='Darse de baja de una materia')
         btnBaja.bind(on_release=self.darBajaMaeteria(matcom,u))
         mm = MostrarMaterias()
@@ -96,7 +99,7 @@ class MostrarInformacion(Popup):
         hp=Label(text='Hora Practica')
         dp=Label(text='Dia Practica')
         ap=Label(text='Aula Practica')
-        nombreMateria = Label(text=nomMateria.nombre)
+        nombreMateria = Label(text=nomMateria)
         numComision = Label(text=numeroComision) 
         horaT = Label(text=matcom.horarioTeoria)
         diaT = Label(text=matcom.diaTeoria)
@@ -123,7 +126,7 @@ class MostrarInformacion(Popup):
         box.add_widget(gLayout)
         box.add_widget(btnAtras)
         box.add_widget(btnBaja)
-        pop= Popup(Title='Mostrar Informacion',content=box,padding=10)
+        pop = Popup(Title='Mostrar Informacion',content=box,padding=10)
         return pop
 
      
@@ -199,12 +202,12 @@ class MenuPrincipal(Popup):
         self.open()
 
     def construir(self,u):
-        box= BoxLayout(orientation='vertical',padding=5)
-        txt= Label(text='Menu Principal')
-        gLayout= GridLayout(cols=1, padding=5)
-        btnMaterias= Button(text='Materias')
+        box = BoxLayout(orientation='vertical',padding=5)
+        txt = Label(text='Menu Principal')
+        gLayout = GridLayout(cols=1, padding=5)
+        btnMaterias = Button(text='Materias')
         btnAgregarMaterias=Button(text='Agregar Materias')
-        btnSalir=Button(text='Salir')
+        btnSalir = Button(text='Salir')
         btnMaterias.bind(on_release=self.mostrarMaterias(u))
         btnAgregarMaterias.bind(on_release=self.agregarMateria(u))
         btnSalir.bind(on_release=None)
@@ -213,7 +216,7 @@ class MenuPrincipal(Popup):
         gLayout.add_widget(btnSalir)
         box.add_widget(txt)
         box.add_widget(gLayout)
-        pop= Popup(title='Menu Principal',content=box,padding=5)
+        pop = Popup(title ='Menu Principal',content=box,padding=5)
         return pop
 
     def mostrarMaterias(self,u):
@@ -268,7 +271,7 @@ class registroPop(Popup):
     def validarUsuario(self,leg,nom,app,mail,cont1,cont2):
         if(leg!='' or nom!='' or app!='' or mail!='' or cont1!='' or cont2!=''):
             if(cont1 == cont2):
-                usu = Alumno.altaUsuario(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1)) #registrar ususario en tabal usuarios
+                usu = Alumno.altaUsuario(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1)) #instanciar     #registrar ususario en tabal usuarios
                 ex= Exito('Se registro el usuario con exito',title='Exito',size_hint=(None,None),size=(600,200))
                 ex.open()
                 mp = MenuPrincipal()
@@ -292,7 +295,7 @@ class SeleccionarMateria(Popup):
         box=BoxLayout(orientation='vertical', padding=10)
         txt = Label(text ='MATERIAS')
         gLayout= GridLayout(cols=1, padding=10)
-        mats = Materia.traerMaterias()
+        mats = Materia.traerMaterias()#instanciar
         for mat in mats:
             btn = Button(text = mat.nombreMateria)
             btn.bind(on_release=self.confirmar(mat,u))
@@ -337,9 +340,9 @@ class SeleccionarComision(Popup):
         box= BoxLayout(orientation='horizontal',padding=10)
         txt=Label(text='Seleccione Comision')
         gLayout = GridLayout(cols=2,padding=10)
-        comis = ComisionMateria.traerComisiones(mat)
+        comis = ComisionMateria.traerComisiones(mat) #instanciar
         for com in comis:
-            btn=Button(text=com.descripcion)
+            btn=Button(text=com.nroComision)
             btn.bind(on_release=self.confirmar(mat,com,u))
             gLayout.add_widget(btn)
         box.add_widget(txt)
@@ -364,8 +367,10 @@ class SeleccionarComision(Popup):
     
     
     def altaACM(self,m,c,u):
-        cm = ComisionMateria.devolver(m,c)
-        res = AlumnoComisionMateria.alta(AlumnoComisionMateria(alumno_id=u.id,comision_materia_id=cm.comision_materia_id,alumno=u,comisionmateria=cm))
+        icm = ComisionMateria()
+        cm = icm.devolver(m,c)
+        iacm = AlumnoComisionMateria()
+        res = iacm.alta(AlumnoComisionMateria(alumno_id=u.id,comision_materia_id=cm.comision_materia_id,alumno=u,comisionmateria=cm))
         if res==True:
             ex= Exito('¡Se agrego la materia con exito!',title='Exito',size_hint=(None,None),size=(600,200))
             ex.open()
