@@ -257,8 +257,8 @@ def buscarNoticias():
 
 # popup que muestra que las contrasenas son invalidas para en el registro
 def invalidContrasena():
-    pop = Popup(title='Contraseña inválida.',
-                content=Label(text='Las contraseñas no coinciden.'),
+    pop = Popup(title='Contrasena inválida.',
+                content=Label(text='Las contrasenas no coinciden.'),
                 size_hint=(None, None), size=(400, 400))
     pop.open()
 

@@ -85,7 +85,8 @@ class MostrarInformacion(Popup):
         box.clear_widgets()
         gLayout=GridLayout(cols=2,padding=5)
         gLayout.clear_widgets()
-        nomMateria,numeroComision = ComisionMateria.infoMat(matcom)
+        comMat= ComisionMateria()
+        nomMateria,numeroComision = comMat.infoMat(matcom)
         btnBaja= Button(text='Darse de baja de una materia')
         btnBaja.bind(on_release=self.darBajaMaeteria(matcom,u))
         mm = MostrarMaterias()
@@ -271,7 +272,8 @@ class registroPop(Popup):
     def validarUsuario(self,leg,nom,app,mail,cont1,cont2):
         if(leg!='' or nom!='' or app!='' or mail!='' or cont1!='' or cont2!=''):
             if(cont1 == cont2):
-                usu = Alumno.altaUsuario(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1)) #instanciar     #registrar ususario en tabal usuarios
+                a=Alumno()
+                usu = a.altaUsuario(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1)) #instanciar     #registrar ususario en tabal usuarios
                 ex= Exito('Se registro el usuario con exito',title='Exito',size_hint=(None,None),size=(600,200))
                 ex.open()
                 mp = MenuPrincipal()
@@ -295,7 +297,8 @@ class SeleccionarMateria(Popup):
         box=BoxLayout(orientation='vertical', padding=10)
         txt = Label(text ='MATERIAS')
         gLayout= GridLayout(cols=1, padding=10)
-        mats = Materia.traerMaterias()#instanciar
+        m=Materia()
+        mats = m.traerMaterias()#instanciar
         for mat in mats:
             btn = Button(text = mat.nombreMateria)
             btn.bind(on_release=self.confirmar(mat,u))
@@ -340,7 +343,8 @@ class SeleccionarComision(Popup):
         box= BoxLayout(orientation='horizontal',padding=10)
         txt=Label(text='Seleccione Comision')
         gLayout = GridLayout(cols=2,padding=10)
-        comis = ComisionMateria.traerComisiones(mat) #instanciar
+        c= ComisionMateria()
+        comis = c.traerComisiones(mat) #instanciar
         for com in comis:
             btn=Button(text=com.nroComision)
             btn.bind(on_release=self.confirmar(mat,com,u))
