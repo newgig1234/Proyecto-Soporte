@@ -163,7 +163,7 @@ class MDListBottomSheet(MDBottomSheet):
         else:
             item = OneLineListItem(text=text, on_release=callback)
 
-        item.bind(on_release=lambda x: self.dismiss())
+        item.bind(on_release= lambda x:  lambda x: self.dismiss())
         self.mlist.add_widget(item)
 
 
@@ -206,7 +206,7 @@ class MDGridBottomSheet(MDBottomSheet):
             on_release=callback,
             source=icon_src
         )
-        item.bind(on_release=lambda x: self.dismiss())
+        item.bind(on_release= lambda x:  lambda x: self.dismiss())
         if len(self.gl_content.children) % 3 == 0:
             self.gl_content.height += dp(96)
         self.gl_content.add_widget(item)

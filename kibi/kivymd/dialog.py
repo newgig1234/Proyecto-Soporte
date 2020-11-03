@@ -87,7 +87,7 @@ class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
                               size_hint=(None, None),
                               height=dp(36))
         if action:
-            button.bind(on_release=action)
+            button.bind(on_release= lambda x:  action)
         button.text_color = self.theme_cls.primary_color
         button.md_bg_color = self.theme_cls.bg_light
         self._action_buttons.append(button)

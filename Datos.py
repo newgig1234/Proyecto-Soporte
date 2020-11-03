@@ -1,6 +1,6 @@
 #from typing import final
 import sqlalchemy
-from sqlalchemy import Column, String, Integer, ForeignKey, Date, Time, MetaData
+from sqlalchemy import Column, String, Integer, ForeignKey, Date, Time, MetaData, and_
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.sql.sqltypes import DateTime, INTEGER
 from sqlalchemy.ext.declarative import declarative_base
@@ -33,8 +33,8 @@ class Alumno(Base):
     def validarUsuario(self, leg, psw):
         #try:
             conn = crearConexion()
-            val = conn.query(Alumno).filter(
-                Alumno.legajo == leg and Alumno.password == psw).first() #o fetchall()
+            val = conn.query(Alumno).filter(and_(
+                Alumno.legajo == int(leg) ,Alumno.password == psw)).first() #o fetchall()
         # except SQLAlchemyError as e:
         #     error = str(e.__dict__['orig'])
         #     val = None
@@ -79,7 +79,7 @@ class Materia(Base):
     #     self.tipoMateria = tipoMateria
 
     def __repr__(self):
-        return f'materia {self.nombreMateria}'
+        return f'materia: {self.nombreMateria}'
 
     def traerMaterias(self):
         #try:
@@ -105,8 +105,8 @@ class Comision(Base):
     #     self.nroComision = nrocom
     #     self.cicloLectivo = cicloLectivo
 
-    def __repr__(self):
-        pass
+    # def __repr__(self):
+    #     pass
 
 
 class ComisionMateria(Base):
@@ -155,7 +155,7 @@ class ComisionMateria(Base):
     def traerComisiones(self, m):
         #try:
             conn = crearConexion()
-            q = conn.query(Comision).filter(ComisionMateria.materia_id == m.id and ComisionMateria.comision_id == Comision.id).all()
+            q = conn.query(Comision).filter(and_(ComisionMateria.materia_id == m.id, ComisionMateria.comision_id == Comision.id)).all()
         # except SQLAlchemyError as e:
         #     error = str(e.__dict__['orig'])
         #     print(error)
@@ -166,7 +166,7 @@ class ComisionMateria(Base):
     def devolver(self, m, c):
         #try:
             conn = crearConexion()
-            q = conn.query(ComisionMateria).filter(ComisionMateria.materia_id == m.id and ComisionMateria.comision_id == Comision.id).first()
+            q = conn.query(ComisionMateria).filter(and_(ComisionMateria.materia_id == m.id, ComisionMateria.comision_id == Comision.id)).first()
         # except SQLAlchemyError as e:
         #     error = str(e.__dict__['orig'])
         #     print(error)
@@ -206,10 +206,10 @@ class AlumnoComisionMateria(Base):  # clase
     def traerMateriasAlumno(self, alu):
         # try:
             conn = crearConexion()
-            q = conn.query(Materia.nombreMateria).filter(
-                AlumnoComisionMateria.alumno_id == alu.id and 
-                AlumnoComisionMateria.comision_materia_id == ComisionMateria.comision_materia_id and
-                ComisionMateria.materia_id == Materia.id).all()
+            q = conn.query(Materia.nombreMateria).filter(and_(
+                AlumnoComisionMateria.alumno_id == alu.id, 
+                AlumnoComisionMateria.comision_materia_id == ComisionMateria.comision_materia_id,
+                ComisionMateria.materia_id == Materia.id)).all()
         # except SQLAlchemyError as e:
         #     error = str(e.__dict__['orig'])
         #     print(error)
@@ -220,8 +220,8 @@ class AlumnoComisionMateria(Base):  # clase
     def bajaMateria(self, a, cm):
         #try:
             conn = crearConexion()
-            conn.query(AlumnoComisionMateria).filter(AlumnoComisionMateria.alumno.id == a.id 
-            and AlumnoComisionMateria.comisionMateria.comision_materia_id == cm.comision_materia_id).delete()
+            conn.query(AlumnoComisionMateria).filter(and_(AlumnoComisionMateria.alumno.id == a.id 
+             ,AlumnoComisionMateria.comisionMateria.comision_materia_id == cm.comision_materia_id)).delete()
             conn.commit()
         # except SQLAlchemyError as e:
         #     error = str(e.__dict__['orig'])

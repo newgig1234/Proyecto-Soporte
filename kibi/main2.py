@@ -281,8 +281,8 @@ def confirmacionSalir():
     
     pop=Popup(title='Salir a página de inicio?',content=box,auto_dismiss=False)
 
-    btn1.bind(on_release=sm.current('login'))
-    btn2.bind(on_release=sm.current('mp'))
+    btn1.bind(on_release= lambda x:  sm.current('login'))
+    btn2.bind(on_release= lambda x:  sm.current('mp'))
 
     pop.open()
 #-----------------------------------------------------
