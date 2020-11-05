@@ -10,14 +10,14 @@ from sqlalchemy.sql.elements import Null
 
 from Datos import Alumno,Materia,Comision,AlumnoComisionMateria,ComisionMateria
 kivy.require("1.11.0")
-#-------------------------------------------------------------------------------------- https://meet.google.com/iqs-ksip-jta
+
+#-------------------------------------------------------------------------------------- 
 class Error(Popup):
-    #error= BoxLayout(orientation='vertical')
+
     def __init__(self,msj, **kwargs):
         super().__init__(**kwargs)
         self.error = BoxLayout(orientation="vertical")
         self.add_widget(self.error)
-        #self.error = error
         self.construir(msj)
 
     def construir(self, msj):
@@ -31,12 +31,11 @@ class Error(Popup):
         self.error.dismiss()
 
 class Exito(Popup):
-    #exito= BoxLayout(orientation='vertical')
+
     def __init__(self,msj, **kwargs):
         super().__init__(**kwargs)
         self.exito = BoxLayout(orientation="vertical")
         self.add_widget(self.exito)
-        #self.exito = exito
         self.construir(msj)
 
     def construir(self, msj):
@@ -52,27 +51,22 @@ class Exito(Popup):
 class MostrarMaterias:
 
     def build(self,u):
-        #self.construir(u).open()
-
-        #def construir(self,u):
-        box= BoxLayout(orientation='vertical',padding=10)
-        box.clear_widgets()
-        gLayout= GridLayout(cols=1,padding=10)
-        gLayout.clear_widgets()
+        box= BoxLayout(orientation='vertical')
+        gLayout= GridLayout(cols=2)
         acm= AlumnoComisionMateria()
         mats= acm.traerMateriasAlumno(u)
-        #mats = AlumnoComisionMateria.traerMateriasAlumno(u)
-        mi = MostrarInformacion()
-        if not(mats):
+        if mats:
             for matcom in mats:
-                btn = Button(text = matcom.materia.nombreMateria)
-                btn.bind(on_release= lambda x:  mi.build(matcom,u))
+                mi = MostrarInformacion()
+                nm = matcom.nombreMat
+                btn = Button(text = nm.nombreMateria)
+                btn.bind(on_release= lambda x: mi.build(matcom,u))
                 gLayout.add_widget(btn)
         btnVolver = Button(text='Atras')
         btnVolver.bind(on_release= self.cerrar)
         box.add_widget(gLayout)
-        box.addwidget(btnVolver)
-        self.pop=Popup(Title='Mis Materias',content=box,padding=5)
+        box.add_widget(btnVolver)
+        self.pop= Popup(Title='Mis Materias',content=box)
         self.pop.open()
         
     def cerrar(self):
@@ -81,11 +75,9 @@ class MostrarMaterias:
 class MostrarInformacion:
 
     def build(self,matcom,u):
-        #self.construir(mc,u).open()    
-    #def construir(self,matcom,u):
         box= BoxLayout(orientation='vertical')
         box.clear_widgets()
-        gLayout=GridLayout(cols=2,padding=5)
+        gLayout=GridLayout(cols=2)
         gLayout.clear_widgets()
         comMat= ComisionMateria()
         nomMateria,numeroComision = comMat.infoMat(matcom)
@@ -129,11 +121,11 @@ class MostrarInformacion:
         box.add_widget(gLayout)
         box.add_widget(btnAtras)
         box.add_widget(btnBaja)
-        self.pop = Popup(Title='Mostrar Informacion',content=box,padding=10)
+        self.pop = Popup(Title='Mostrar Informacion',content=box)
         self.pop.open()
 
     def darBajaMaeteria(self,mc,u):
-        amc = AlumnoComisionMateria().bajaMateria(u,mc)#ver esto
+        amc = AlumnoComisionMateria().bajaMateria(u,mc)
         if amc == True:
             ex= Exito('Se elimino la materia de su lista correctamente.',title='Exito',size_hint=(None,None),size=(600,200))
             ex.open()
@@ -148,12 +140,9 @@ class MostrarInformacion:
 class loginPopup:
     
     def build(self):
-        #self.construir().open()
-
-    #def construir(self):
-        box= BoxLayout(orientation='vertical', padding=5)
+        box= BoxLayout(orientation='vertical')
         txt= Label(text='Login')
-        gLayout=GridLayout(cols=2, padding=10)
+        gLayout=GridLayout(cols=2)
         txtUser=Label(text='Legajo')
         txtPsw=Label(text='Contrasena')
         txtIUser= TextInput(multiline=False)
@@ -170,7 +159,7 @@ class loginPopup:
         box.add_widget(gLayout)
         box.add_widget(btn)
         box.add_widget(btnR)
-        self.pop = Popup(title='Login',content=box, padding=5)
+        self.pop = Popup(title='Login',content=box)
         self.pop.open()
 
     def irRegistro(self):
@@ -181,7 +170,7 @@ class loginPopup:
         if (leg!='' and psw!=''):
             a= Alumno()
             x = a.validarUsuario(leg,psw) #validar usuario en tabal usuarios
-            if (x != None):#ver que onda esto
+            if (x != None):
                 mp = MenuPrincipal()
                 mp.build(x)
             else:
@@ -195,12 +184,9 @@ class loginPopup:
 class MenuPrincipal:
 
     def build(self,u):
-        #self.construir(us).open()
-
-    #def construir(self,u):
-        box = BoxLayout(orientation='vertical',padding=5)
+        box = BoxLayout(orientation='vertical')
         txt = Label(text='Menu Principal')
-        gLayout = GridLayout(cols=1, padding=5)
+        gLayout = GridLayout(cols=1)
         btnMaterias = Button(text='Materias')
         btnAgregarMaterias=Button(text='Agregar Materias')
         btnSalir = Button(text='Salir')
@@ -212,11 +198,11 @@ class MenuPrincipal:
         gLayout.add_widget(btnSalir)
         box.add_widget(txt)
         box.add_widget(gLayout)
-        self.pop = Popup(title ='Menu Principal',content=box,padding=5)
+        self.pop = Popup(title ='Menu Principal',content=box)
         self.pop.open()
 
     def mostrarMaterias(self,u):
-        mm= MostrarMaterias()
+        mm = MostrarMaterias()
         mm.build(u)
 
     def agregarMateria(self,u):
@@ -229,11 +215,8 @@ class MenuPrincipal:
 
 class registroPop:
     def build(self):
-        #self.construir().open()
-
-    #def construir(self):
-        box= BoxLayout(orientation='vertical',padding=5)
-        gLayout= GridLayout(cols=2,padding=5)
+        box= BoxLayout(orientation='vertical')
+        gLayout= GridLayout(cols=2)
         txt= Label(text='Registro')
         btnAceptar=Button(text='aceptar')
         txtLegajo= Label(text='Legajo')
@@ -264,12 +247,12 @@ class registroPop:
         box.add_widget(txt)
         box.add_widget(gLayout)
         box.add_widget(btnAceptar)
-        self.pop= Popup(title='Registro', content=box,padding=5)
+        self.pop= Popup(title='Registro', content=box)
         self.pop.open()
 
     def validarUsuario(self,leg,nom,app,mail,cont1,cont2):
         if (4<len(leg)<6 and 5<len(cont1) and 5<len(cont2)):
-            if (leg !='' and nom!='' and app!='' and mail!='' and cont1!='' and cont2!=''):
+            if (leg !='' and nom!='' and app!='' and mail!='' and cont1!='' and cont2!='' and ('@' in mail and '.' in mail)):
                 if(cont1 == cont2):
                     a=Alumno()
                     a.altaUsuario(leg,nom,app,mail,cont1) #instanciar     #registrar ususario en tabal usuarios
@@ -284,7 +267,7 @@ class registroPop:
                     reg = registroPop()
                     reg.build()
             else:
-                er1= Error('Complete todos los campos', title='Error',size_hint=(None,None),size=(600,200))
+                er1= Error('Complete todos los campos de manera correcta', title='Error',size_hint=(None,None),size=(600,200))
                 er1.open()
         else: 
             er2=Error('Legajo y/o Password no tiene la longitud necesaria', title='Error',size_hint=(None,None),size=(600,200))
@@ -293,39 +276,23 @@ class registroPop:
 class SeleccionarMateria:
 
     def build(self,u):
-        #self.construir(u).open()
 
-    #def construir(self,u):
-        box=BoxLayout(orientation='vertical', padding=10)
+        box=BoxLayout(orientation='vertical')
         txt = Label(text ='MATERIAS')
-        gLayout= GridLayout(cols=1, padding=10)
+        gLayout= GridLayout(cols=2)
         m=Materia()
-        mats = m.traerMaterias()#instanciar
+        mats = m.traerMaterias()
         for mat in mats:
+            print(mat.id)
             btn = Button(text = mat.nombreMateria)
-            btn.bind(on_release= lambda x:  self.confirmar(mat,u))
+            btn.bind(on_release= lambda x:  self.selecCom(mat,u))
             gLayout.add_widget(btn)
         btnAtras=Button(text='Atras')
         btnAtras.bind(on_release= lambda x:  self.cerrar())
         box.add_widget(txt)
         box.add_widget(gLayout)
         box.add_widget(btnAtras)
-        self.pop = Popup(title='SelecionarMateria',content=box,padding=10)
-        self.pop.open()
-
-    def confirmar(self,m,u):
-        box = BoxLayout(orientation='vertical',padding=10)
-        gLayout= GridLayout(cols=2,row=1,padding=10)
-        txt= Label(text='¿Esta seguro que desea inscribirse a esta materia?')
-        btnAceptar = Button(text='Aceptar')
-        btnCancelar= Button(text='Cancelar')
-        btnAceptar.bind(on_release = lambda x:  self.selecCom(m,u))
-        btnCancelar.bind(on_release = lambda x:  self.build(u))
-        box.add_widget(txt)
-        gLayout.add_widget(btnCancelar)
-        gLayout.add_widget(btnAceptar)
-        box.add_widget=gLayout
-        self.pop = Popup(Title='Confirmar',content=box)
+        self.pop = Popup(title='SelecionarMateria',content=box)
         self.pop.open()
 
     def selecCom(self,m,u):
@@ -338,14 +305,17 @@ class SeleccionarMateria:
 class SeleccionarComision:
 
     def build(self,mat,u):
-        #self.construir(m,u).open()
-
-    #def construir(self,mat,u):
-        box= BoxLayout(orientation='horizontal',padding=10)
+        box= BoxLayout(orientation='horizontal')
         txt=Label(text='Seleccione Comision')
-        gLayout = GridLayout(cols=2,padding=10)
+        gLayout = GridLayout(cols=2)
         c= ComisionMateria()
-        comis = c.traerComisiones(mat) #instanciar
+        comis = c.traerComisiones(mat)
+        if comis:
+            print('Existe')
+            print(comis)
+        else:
+            print('No existe')
+            print(comis)
         for com in comis:
             btn=Button(text=com.nroComision)
             btn.bind(on_release= lambda x:  self.confirmar(mat,com,u))
@@ -357,9 +327,9 @@ class SeleccionarComision:
 
 
     def confirmar(self,m,c,u):
-        box= BoxLayout(orientation='vertical',padding=10)
-        txt= Label(text='¿Desea esta comision, Materia{materia}, Comision{comision}?'.format(materia=m.nombre,comision=c.detalle))
-        gLayout= GridLayout(cols=2,padding=10)
+        box= BoxLayout(orientation='vertical')
+        txt= Label(text='¿Desea inscribirse a {materia} en la comision {comision}?'.format(materia=m.nombreMateria,comision=c.nroComision))
+        gLayout= GridLayout(cols=2)
         btnCancelar=Button(text='Cancelar')
         btnCancelar.bind(on_release= lambda x:  self.build(m,u))#funcion boton cancelar
         btnAceptar=Button(text='Aceptar')
@@ -370,14 +340,12 @@ class SeleccionarComision:
         box.add_widget(gLayout)
         self.pop=Popup(title='Confirmar',content=box)
         self.pop.open()
-        #return pop
-    
     
     def altaACM(self,m,c,u):
         icm = ComisionMateria()
         cm = icm.devolver(m,c)
         iacm = AlumnoComisionMateria()
-        res = iacm.alta(AlumnoComisionMateria(alumno_id=u.id,comision_materia_id=cm.comision_materia_id,alumno=u,comisionmateria=cm))
+        res = iacm.alta(cm,u)
         if res==True:
             ex= Exito('¡Se agrego la materia con exito!',title='Exito',size_hint=(None,None),size=(600,200))
             ex.open()

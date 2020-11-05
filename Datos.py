@@ -1,4 +1,3 @@
-#from typing import final
 import sqlalchemy
 from sqlalchemy import Column, String, Integer, ForeignKey, Date, Time, MetaData, and_ , create_engine
 from sqlalchemy.orm import relationship, sessionmaker
@@ -22,37 +21,19 @@ class Alumno(Base):
     legajo = Column(String, nullable=False)  # id login
     password = Column(String, nullable=False)
 
-    # clases = relationship('Comision', secondary='alumnocomisionmateria', backref='alumnos')#problema
-    # comision = relationship('Materia', secondary='alumnocomisionmateria', backref='alumnos')#problema
-
-    # def __repr__(self):
-    #     return f'User {self.name} {self.surname}'
 
     def validarUsuario(self, leg, psw):
-        #try:
-            conn = crearConexion()
-            val = conn.query(Alumno).filter(and_(
-                Alumno.legajo == leg ,Alumno.password == psw)).first() #o fetchall()
-        # except SQLAlchemyError as e:
-        #     error = str(e.__dict__['orig'])
-        #     val = None
-        #     print(error)
-        # finally:
-            cerrarConexion(conn)
-            return val
+        conn = crearConexion()
+        val = conn.query(Alumno).filter(and_(
+            Alumno.legajo == leg ,Alumno.password == psw)).first()
+        cerrarConexion(conn)
+        return val
 
     def altaUsuario(self,leg,nom,app,mail,cont1):
-        #try:
-            conn = crearConexion()
-            conn.add(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1))
-            conn.commit()
-            
-        # except SQLAlchemyError as e:
-        #     error = str(e.__dict__['orig'])
-        #     print(error)
-        # finally:
-            cerrarConexion(conn)
-            #return q
+        conn = crearConexion()
+        conn.add(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1))
+        conn.commit()
+        cerrarConexion(conn)
     
     def buscarUsuario(self,leg):
         conn = crearConexion()
@@ -66,35 +47,13 @@ class Materia(Base):
     id = Column(INTEGER, primary_key=True, autoincrement=True, nullable=False)
     nombreMateria = Column(String)
     anioCursado = Column(String)
-    profesor = Column(String)
-    email_profesor = Column(String)
-    tipoMateria = Column(String)  # si es electiva o no
+    tipoMateria = Column(String)
 
-    # poner una columna que haga referencia a la tabla (FK)
-    # poner la relationship entre las dos tablas
-
-    #comision= relationship('Comision',secondary='comisionmateria')
-
-    # def __init__(self, nombreMateria='inicio', anio='2002', profesor='Pablo gomez', email_profesor='a@gmail.com', tipoMateria='Electiva'):
-    #     self.nombreMateria = nombreMateria
-    #     self.anioCursado = anio
-    #     self.profesor = profesor
-    #     self.email_profesor = email_profesor
-    #     self.tipoMateria = tipoMateria
-
-    # def __repr__(self):
-    #     return f'materia: {self.nombreMateria}'
-
-    def traerMaterias(self):
-        #try:
-            conn = crearConexion()
-            q = conn.query(Materia).all()
-        # except SQLAlchemyError as e:
-        #     error = str(e.__dict__['orig'])
-        #     print(error)
-        # finally:
-            cerrarConexion(conn)
-            return q
+    def traerMaterias(self): 
+        conn = crearConexion()
+        q = conn.query(Materia).all()
+        cerrarConexion(conn)
+        return q
 
 
 class Comision(Base):
@@ -102,15 +61,6 @@ class Comision(Base):
     id = Column(INTEGER, primary_key=True, autoincrement=True, nullable=False)
     nroComision = Column(String)
     cicloLectivo = Column(INTEGER)
-
-    # materia=relationship('Materia',secondary='comisionmateria')
-
-    # def __init__(self, nrocom, cicloLectivo):
-    #     self.nroComision = nrocom
-    #     self.cicloLectivo = cicloLectivo
-
-    # def __repr__(self):
-    #     pass
 
 
 class ComisionMateria(Base):
@@ -122,6 +72,10 @@ class ComisionMateria(Base):
     horarioPractica = Column(String, nullable=True)
     diaPractica = Column(String, nullable=True)
     aulaPractica = Column(String, nullable=True)
+    profesorT = Column(String)
+    email_profesorT = Column(String)
+    profesorP= Column(String)
+    email_profesorP=Column(String)
 
     materia_id = Column(Integer, ForeignKey(Materia.id))
     comision_id = Column(Integer, ForeignKey(Comision.id))
@@ -129,60 +83,37 @@ class ComisionMateria(Base):
     relMateria = relationship("Materia", backref="materias", foreign_keys=[materia_id])
     relComision = relationship("Comision", backref="comisiones", foreign_keys=[comision_id])
 
-    # alumnos = relationship('Alumno', secondary='alumnocomisionmateria', back_populates='comisionmateria')
-
-    # def __init__(self, horaT='7:00-9:00', diaT='Lunes', aulaT='404', horaP='9:00-11:00', diaP='Martes', aulaP='505'):
-    #     self.horarioTeoria = horaT
-    #     self.diaTeoria = diaT
-    #     self.aulaTeoria = aulaT
-    #     self.horarioPractica = horaP
-    #     self.diaPractica = diaP
-    #     self.aulaPractica = aulaP
-
-    # def __repr__(self):
-    #     return f'Clase {self.comision_id}{self.materia_id} Teoria {self.diaTeoria} {self.horarioTeoria} Practica {self.diaPractica}{self.horarioPractica}'
-
     def infoMat(self, cm):
-        #try:
-            conn = crearConexion()
-            nm = conn.query(ComisionMateria.materia.nombreMateria).filter(
-                ComisionMateria.materia_id == cm.materia_id).first()
-            nc = conn.query(ComisionMateria.comision.nroComision).filter(
-                ComisionMateria.comision_id == cm.comision_id).first()
-        # except SQLAlchemyError as e:et
-        #     error = str(e.__dict__['orig'])
-        #     print(error)
-        # finally:
-            cerrarConexion(conn)
-            return nm, nc
+        conn = crearConexion()
+        nm = conn.query(ComisionMateria.relMateria.nombreMateria).filter(
+            ComisionMateria.materia_id == cm.materia_id).first()
+        nc = conn.query(ComisionMateria.relComision.nroComision).filter(
+            ComisionMateria.comision_id == cm.comision_id).first()
+        cerrarConexion(conn)
+        return nm, nc
     
 
     def traerComisiones(self, m):
-        #try:
-            conn = crearConexion()
-            q = conn.query(Comision).filter(and_(ComisionMateria.materia_id == m.id, ComisionMateria.comision_id == Comision.id)).all()
-        # except SQLAlchemyError as e:
-        #     error = str(e.__dict__['orig'])
-        #     print(error)
-        # finally:
-            cerrarConexion(conn)
-            return q
+        conn = crearConexion()
+        q = conn.query(Comision).filter(and_(ComisionMateria.materia_id == m.id, ComisionMateria.comision_id == Comision.id)).all()
+        cerrarConexion(conn)
+        return q
 
     def devolver(self, m, c):
-        #try:
-            conn = crearConexion()
-            q = conn.query(ComisionMateria).filter(and_(ComisionMateria.materia_id == m.id, ComisionMateria.comision_id == Comision.id)).first()
-        # except SQLAlchemyError as e:
-        #     error = str(e.__dict__['orig'])
-        #     print(error)
-        # finally:
-            cerrarConexion(conn)
-            return q
+        conn = crearConexion()
+        q = conn.query(ComisionMateria).filter(and_(ComisionMateria.materia_id == m.id, ComisionMateria.comision_id == c.id)).first()
+        cerrarConexion(conn)
+        return q
+    
+    def nombreMat(self):
+        conn = crearConexion()
+        q = conn.query(Materia).filter(ComisionMateria.materia_id == Materia.id).first()
+        cerrarConexion(conn)
+        return q
 
 
-class AlumnoComisionMateria(Base):  # clase
+class AlumnoComisionMateria(Base):
     __tablename__ = 'alumnocomisionmateria'
-    #id = Column(Integer, primary_key=True)
 
     alumno_id = Column(Integer, ForeignKey('alumnos.id'), primary_key=True)
     comision_materia_id = Column(Integer, ForeignKey(
@@ -196,44 +127,28 @@ class AlumnoComisionMateria(Base):  # clase
     def __repr__(self):
         pass
 
-    def alta(self, entrada):
-        #try:
-            conn = crearConexion()
-            conn.add(entrada)
-            conn.commit()
-        # except SQLAlchemyError as e:
-        #     error = str(e.__dict__['orig'])
-        #     print(error)
-        # finally:
-            cerrarConexion(conn)
-            return True
+    def alta(self,cm,u):
+        conn = crearConexion()
+        conn.add(AlumnoComisionMateria(alumno_id=u.id,comision_materia_id=cm.comision_materia_id))
+        conn.commit()
+        cerrarConexion(conn)
+        return True
 
     def traerMateriasAlumno(self, alu):
-        # try:
-            conn = crearConexion()
-            q = conn.query(Materia.nombreMateria).filter(and_(
-                AlumnoComisionMateria.alumno_id == alu.id, 
-                AlumnoComisionMateria.comision_materia_id == ComisionMateria.comision_materia_id,
-                ComisionMateria.materia_id == Materia.id)).all()
-        # except SQLAlchemyError as e:
-        #     error = str(e.__dict__['orig'])
-        #     print(error)
-        # finally:
-            cerrarConexion(conn)
-            return q
+        conn = crearConexion()
+        q = conn.query(ComisionMateria).filter(and_(
+            AlumnoComisionMateria.alumno_id == alu.id, 
+            AlumnoComisionMateria.comision_materia_id == ComisionMateria.comision_materia_id,)).all()
+        cerrarConexion(conn)
+        return q
 
     def bajaMateria(self, a, cm):
-        #try:
-            conn = crearConexion()
-            conn.query(AlumnoComisionMateria).filter(and_(AlumnoComisionMateria.alumno.id == a.id 
-             ,AlumnoComisionMateria.comisionMateria.comision_materia_id == cm.comision_materia_id)).delete()
-            conn.commit()
-        # except SQLAlchemyError as e:
-        #     error = str(e.__dict__['orig'])
-        #     print(error)
-        # finally:
-            cerrarConexion(conn)
-            return True
+        conn = crearConexion()
+        conn.query(AlumnoComisionMateria).filter(and_(AlumnoComisionMateria.relAlumno.id == a.id 
+            ,AlumnoComisionMateria.relComisionMateria.comision_materia_id == cm.comision_materia_id)).delete()
+        conn.commit()
+        cerrarConexion(conn)
+        return True
 
 
 def crearConexion():
@@ -248,7 +163,6 @@ def crearConexion():
 def crearTablas():
     engine = create_engine('sqlite:///datos.db')
     meta = MetaData()
-    # Base=declarative_base()
     meta.create_all(engine)
 
 
