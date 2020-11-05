@@ -1,18 +1,16 @@
 #from typing import final
 import sqlalchemy
-from sqlalchemy import Column, String, Integer, ForeignKey, Date, Time, MetaData, and_
+from sqlalchemy import Column, String, Integer, ForeignKey, Date, Time, MetaData, and_ , create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.sql.sqltypes import DateTime, INTEGER
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 
 Base = declarative_base()
 # https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_quick_guide.htm
 # https://docs.sqlalchemy.org/en/13/index.html
-#https://www.fullstackpython.com/sqlalchemy-code-examples.html
-#https://docs.sqlalchemy.org/en/14/orm/tutorial.html
+# https://www.fullstackpython.com/sqlalchemy-code-examples.html
+# https://docs.sqlalchemy.org/en/14/orm/tutorial.html
 
 
 class Alumno(Base):
@@ -21,7 +19,7 @@ class Alumno(Base):
     nombre = Column(String)
     apellido = Column(String)
     email = Column(String)
-    legajo = Column(INTEGER, nullable=False)  # id login
+    legajo = Column(String, nullable=False)  # id login
     password = Column(String, nullable=False)
 
     # clases = relationship('Comision', secondary='alumnocomisionmateria', backref='alumnos')#problema
@@ -34,7 +32,7 @@ class Alumno(Base):
         #try:
             conn = crearConexion()
             val = conn.query(Alumno).filter(and_(
-                Alumno.legajo == int(leg) ,Alumno.password == psw)).first() #o fetchall()
+                Alumno.legajo == leg ,Alumno.password == psw)).first() #o fetchall()
         # except SQLAlchemyError as e:
         #     error = str(e.__dict__['orig'])
         #     val = None
@@ -43,18 +41,24 @@ class Alumno(Base):
             cerrarConexion(conn)
             return val
 
-    def altaUsusario(self, entrada):
+    def altaUsuario(self,leg,nom,app,mail,cont1):
         #try:
             conn = crearConexion()
-            conn.add(entrada)
+            conn.add(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1))
             conn.commit()
-            q = conn.query(Alumno).filter(Alumno.id == entrada.id).first()
+            
         # except SQLAlchemyError as e:
         #     error = str(e.__dict__['orig'])
         #     print(error)
         # finally:
             cerrarConexion(conn)
-            return q
+            #return q
+    
+    def buscarUsuario(self,leg):
+        conn = crearConexion()
+        q = conn.query(Alumno).filter(Alumno.legajo == leg).first()
+        cerrarConexion(conn)
+        return q
 
 
 class Materia(Base):
@@ -78,8 +82,8 @@ class Materia(Base):
     #     self.email_profesor = email_profesor
     #     self.tipoMateria = tipoMateria
 
-    def __repr__(self):
-        return f'materia: {self.nombreMateria}'
+    # def __repr__(self):
+    #     return f'materia: {self.nombreMateria}'
 
     def traerMaterias(self):
         #try:
@@ -151,6 +155,7 @@ class ComisionMateria(Base):
         # finally:
             cerrarConexion(conn)
             return nm, nc
+    
 
     def traerComisiones(self, m):
         #try:

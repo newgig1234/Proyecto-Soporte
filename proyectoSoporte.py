@@ -10,7 +10,7 @@ from sqlalchemy.sql.elements import Null
 
 from Datos import Alumno,Materia,Comision,AlumnoComisionMateria,ComisionMateria
 kivy.require("1.11.0")
-#--------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------- https://meet.google.com/iqs-ksip-jta
 class Error(Popup):
     #error= BoxLayout(orientation='vertical')
     def __init__(self,msj, **kwargs):
@@ -28,7 +28,7 @@ class Error(Popup):
         self.error.add_widget(btn)
         
     def cerrar(self,ev):
-        self.dismiss()
+        self.error.dismiss()
 
 class Exito(Popup):
     #exito= BoxLayout(orientation='vertical')
@@ -47,7 +47,7 @@ class Exito(Popup):
         self.exito.add_widget(btn)
         
     def cerrar(self,ev):
-        self.dismiss()
+        self.exito.dismiss()
 
 class MostrarMaterias:
 
@@ -78,9 +78,11 @@ class MostrarMaterias:
     def cerrar(self):
         self.pop.dismiss()
 
-class MostrarInformacion(Popup):
-        
-    def construir(self,matcom,u):
+class MostrarInformacion:
+
+    def build(self,matcom,u):
+        #self.construir(mc,u).open()    
+    #def construir(self,matcom,u):
         box= BoxLayout(orientation='vertical')
         box.clear_widgets()
         gLayout=GridLayout(cols=2,padding=5)
@@ -127,15 +129,11 @@ class MostrarInformacion(Popup):
         box.add_widget(gLayout)
         box.add_widget(btnAtras)
         box.add_widget(btnBaja)
-        pop = Popup(Title='Mostrar Informacion',content=box,padding=10)
-        return pop
-
-     
-    def build(self,mc,u):
-        x = self.construir(mc,u).open()
+        self.pop = Popup(Title='Mostrar Informacion',content=box,padding=10)
+        self.pop.open()
 
     def darBajaMaeteria(self,mc,u):
-        amc = AlumnoComisionMateria().bajaMateria(u,mc)
+        amc = AlumnoComisionMateria().bajaMateria(u,mc)#ver esto
         if amc == True:
             ex= Exito('Se elimino la materia de su lista correctamente.',title='Exito',size_hint=(None,None),size=(600,200))
             ex.open()
@@ -147,16 +145,16 @@ class MostrarInformacion(Popup):
             er.open()
             er.dismiss()
 
-class loginPopup(Popup):
+class loginPopup:
     
     def build(self):
-        x = self.construir().open()
+        #self.construir().open()
 
-    def construir(self):
+    #def construir(self):
         box= BoxLayout(orientation='vertical', padding=5)
         txt= Label(text='Login')
         gLayout=GridLayout(cols=2, padding=10)
-        txtUser=Label(text='Usuario')
+        txtUser=Label(text='Legajo')
         txtPsw=Label(text='Contrasena')
         txtIUser= TextInput(multiline=False)
         txtIPsw= TextInput(multiline=False, password=True)
@@ -172,35 +170,34 @@ class loginPopup(Popup):
         box.add_widget(gLayout)
         box.add_widget(btn)
         box.add_widget(btnR)
-        pop = Popup(title='Login',content=box, padding=5)
-        return pop
+        self.pop = Popup(title='Login',content=box, padding=5)
+        self.pop.open()
 
     def irRegistro(self):
         reg = registroPop()
         reg.build()
     
-    def controlLogin(self,usu:str,psw:str):
-        if (usu!='' and psw!=''):
+    def controlLogin(self,leg:str,psw:str):
+        if (leg!='' and psw!=''):
             a= Alumno()
-            x = a.validarUsuario(usu,psw) #validar usuario en tabal usuarios
-            if (x != {}):#ver que onda esto
+            x = a.validarUsuario(leg,psw) #validar usuario en tabal usuarios
+            if (x != None):#ver que onda esto
                 mp = MenuPrincipal()
                 mp.build(x)
             else:
                 er = Error('Usuario y/o contrasena incorrecta', title='Error',size_hint=(None,None),size=(600,200))
                 er.open()
-                log = loginPopup()
-                log.build()
+
         else:
             er = Error('Complete todos los campos', title='Error',size_hint=(None,None),size=(600,200))
             er.open()
 
-class MenuPrincipal(Popup):
+class MenuPrincipal:
 
-    def build(self,us):
-        x = self.construir(us).open()
+    def build(self,u):
+        #self.construir(us).open()
 
-    def construir(self,u):
+    #def construir(self,u):
         box = BoxLayout(orientation='vertical',padding=5)
         txt = Label(text='Menu Principal')
         gLayout = GridLayout(cols=1, padding=5)
@@ -209,14 +206,14 @@ class MenuPrincipal(Popup):
         btnSalir = Button(text='Salir')
         btnMaterias.bind(on_release= lambda x:  self.mostrarMaterias(u))
         btnAgregarMaterias.bind(on_release= lambda x:  self.agregarMateria(u))
-        btnSalir.bind(on_release= lambda x:  None)
+        btnSalir.bind(on_release= lambda x:  self.cerrar())
         gLayout.add_widget(btnMaterias)
         gLayout.add_widget(btnAgregarMaterias)
         gLayout.add_widget(btnSalir)
         box.add_widget(txt)
         box.add_widget(gLayout)
-        pop = Popup(title ='Menu Principal',content=box,padding=5)
-        return pop
+        self.pop = Popup(title ='Menu Principal',content=box,padding=5)
+        self.pop.open()
 
     def mostrarMaterias(self,u):
         mm= MostrarMaterias()
@@ -226,11 +223,15 @@ class MenuPrincipal(Popup):
         ss= SeleccionarMateria()
         ss.build(u)
 
-class registroPop(Popup):
-    def build(self):
-        x = self.construir().open()
+    def cerrar(self):
+        log = loginPopup()
+        log.build()
 
-    def construir(self):
+class registroPop:
+    def build(self):
+        #self.construir().open()
+
+    #def construir(self):
         box= BoxLayout(orientation='vertical',padding=5)
         gLayout= GridLayout(cols=2,padding=5)
         txt= Label(text='Registro')
@@ -238,7 +239,7 @@ class registroPop(Popup):
         txtLegajo= Label(text='Legajo')
         txtNombre= Label(text='Nombre')
         txtApellido= Label(text='Apellido')
-        txtMail=Label(text='mail')
+        txtMail=Label(text='Mail')
         txtPsw1= Label(text='Contrasena')
         txtPsw2= Label(text='Repetir Contrasena')
         txtILegajo =TextInput(multiline=False)
@@ -259,37 +260,42 @@ class registroPop(Popup):
         gLayout.add_widget(txtIPsw1)
         gLayout.add_widget(txtPsw2)
         gLayout.add_widget(txtIPsw2)
-        btnAceptar.bind(on_release= lambda x:  self.validarUsuario(txtILegajo,txtINombre,txtIApellido,txtIMail,txtIPsw1,txtIPsw2))#aca
+        btnAceptar.bind(on_release= lambda x:  self.validarUsuario(txtILegajo.text,txtINombre.text,txtIApellido.text,txtIMail.text,txtIPsw1.text,txtIPsw2.text))
         box.add_widget(txt)
         box.add_widget(gLayout)
         box.add_widget(btnAceptar)
-        pop= Popup(title='Registro', content=box,padding=5)
-        return pop
+        self.pop= Popup(title='Registro', content=box,padding=5)
+        self.pop.open()
 
     def validarUsuario(self,leg,nom,app,mail,cont1,cont2):
-        if(leg!='' or nom!='' or app!='' or mail!='' or cont1!='' or cont2!=''):
-            if(cont1 == cont2):
-                a=Alumno()
-                usu = a.altaUsuario(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1)) #instanciar     #registrar ususario en tabal usuarios
-                ex= Exito('Se registro el usuario con exito',title='Exito',size_hint=(None,None),size=(600,200))
-                ex.open()
-                mp = MenuPrincipal()
-                mp.build(usu)
+        if (4<len(leg)<6 and 5<len(cont1) and 5<len(cont2)):
+            if (leg !='' and nom!='' and app!='' and mail!='' and cont1!='' and cont2!=''):
+                if(cont1 == cont2):
+                    a=Alumno()
+                    a.altaUsuario(leg,nom,app,mail,cont1) #instanciar     #registrar ususario en tabal usuarios
+                    ex= Exito('Se registro el usuario con exito',title='Exito',size_hint=(None,None),size=(600,200))
+                    ex.open()
+                    usu = a.buscarUsuario(leg)
+                    mp = MenuPrincipal()
+                    mp.build(usu)
+                else:
+                    er= Error('Las contrasenas son diferentes', title='Error',size_hint=(None,None),size=(600,200))
+                    er.open()
+                    reg = registroPop()
+                    reg.build()
             else:
-                er= Error('Las contrasenas son diferentes', title='Error',size_hint=(None,None),size=(600,200))
-                er.open()
-                reg = registroPop()
-                reg.build()
-        else:
-            er= Error('Complete todos los campos', title='Error',size_hint=(None,None),size=(600,200))
-            er.open()
+                er1= Error('Complete todos los campos', title='Error',size_hint=(None,None),size=(600,200))
+                er1.open()
+        else: 
+            er2=Error('Legajo y/o Password no tiene la longitud necesaria', title='Error',size_hint=(None,None),size=(600,200))
+            er2.open()
    
-class SeleccionarMateria(Popup):
+class SeleccionarMateria:
 
     def build(self,u):
-        x = self.construir(u).open()
+        #self.construir(u).open()
 
-    def construir(self,u):
+    #def construir(self,u):
         box=BoxLayout(orientation='vertical', padding=10)
         txt = Label(text ='MATERIAS')
         gLayout= GridLayout(cols=1, padding=10)
@@ -304,8 +310,8 @@ class SeleccionarMateria(Popup):
         box.add_widget(txt)
         box.add_widget(gLayout)
         box.add_widget(btnAtras)
-        pop = Popup(title='SelecionarMateria',content=box,padding=10)
-        return pop
+        self.pop = Popup(title='SelecionarMateria',content=box,padding=10)
+        self.pop.open()
 
     def confirmar(self,m,u):
         box = BoxLayout(orientation='vertical',padding=10)
@@ -313,28 +319,28 @@ class SeleccionarMateria(Popup):
         txt= Label(text='¿Esta seguro que desea inscribirse a esta materia?')
         btnAceptar = Button(text='Aceptar')
         btnCancelar= Button(text='Cancelar')
-        btnAceptar.bind(on_release= lambda x:  self.selecCom(m,u))
-        btnCancelar.bind(on_release= lambda x:  self.creacion())
+        btnAceptar.bind(on_release = lambda x:  self.selecCom(m,u))
+        btnCancelar.bind(on_release = lambda x:  self.build(u))
         box.add_widget(txt)
         gLayout.add_widget(btnCancelar)
         gLayout.add_widget(btnAceptar)
         box.add_widget=gLayout
-        pop = Popup(Title='Confirmar',content=box)
-        return pop
+        self.pop = Popup(Title='Confirmar',content=box)
+        self.pop.open()
 
     def selecCom(self,m,u):
         sm = SeleccionarComision()
         sm.build(m,u)
         
     def cerrar(self):
-        self.dismiss()
+        self.pop.dismiss()
 
-class SeleccionarComision(Popup):
+class SeleccionarComision:
 
-    def build(self,m,u):
-        x = self.construir(m,u).open()
+    def build(self,mat,u):
+        #self.construir(m,u).open()
 
-    def construir(self,mat,u):
+    #def construir(self,mat,u):
         box= BoxLayout(orientation='horizontal',padding=10)
         txt=Label(text='Seleccione Comision')
         gLayout = GridLayout(cols=2,padding=10)
@@ -346,23 +352,25 @@ class SeleccionarComision(Popup):
             gLayout.add_widget(btn)
         box.add_widget(txt)
         box.add_widget(gLayout)
-        pop = Popup(title='Seleccionar Materia',content=box)
-        return pop
+        self.pop = Popup(title='Seleccionar Materia',content=box)
+        self.pop.open()
+
 
     def confirmar(self,m,c,u):
         box= BoxLayout(orientation='vertical',padding=10)
         txt= Label(text='¿Desea esta comision, Materia{materia}, Comision{comision}?'.format(materia=m.nombre,comision=c.detalle))
         gLayout= GridLayout(cols=2,padding=10)
         btnCancelar=Button(text='Cancelar')
-        btnCancelar.bind(on_release= lambda x:  self.creacion(m))#funcion boton cancelar
+        btnCancelar.bind(on_release= lambda x:  self.build(m,u))#funcion boton cancelar
         btnAceptar=Button(text='Aceptar')
         btnAceptar.bind(on_release= lambda x:  self.altaACM(m,c,u))#funcion boton aceptar
         box.add_widget(txt)
         gLayout.add_widget(btnCancelar)
         gLayout.add_widget(btnAceptar)
         box.add_widget(gLayout)
-        pop=Popup(title='Confirmar',content=box)
-        return pop
+        self.pop=Popup(title='Confirmar',content=box)
+        self.pop.open()
+        #return pop
     
     
     def altaACM(self,m,c,u):
