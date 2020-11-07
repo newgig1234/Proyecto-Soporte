@@ -7,6 +7,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from sqlalchemy.sql.elements import Null
+from kivy.properties import NumericProperty
 
 from Datos import Alumno,Materia,Comision,AlumnoComisionMateria,ComisionMateria
 kivy.require("1.11.0")
@@ -47,7 +48,9 @@ class Exito(Popup):
     def cerrar(self,ev):
         self.exito.dismiss()
 
-class MostrarMaterias:
+class MostrarMaterias(Popup):
+    def __init__(self,**kwargs):
+        super(MostrarMaterias,self).__init__(**kwargs)
 
     def build(self,u):
         box= BoxLayout(orientation='vertical')
@@ -71,7 +74,9 @@ class MostrarMaterias:
     def cerrar(self):
         self.pop.dismiss()
 
-class MostrarInformacion:
+class MostrarInformacion(Popup):
+    def __init__(self,**kwargs):
+        super(MostrarInformacion,self).__init__(**kwargs)
 
     def build(self,matcom,u):
         box= BoxLayout(orientation='vertical')
@@ -136,7 +141,9 @@ class MostrarInformacion:
             er.open()
             er.dismiss()
 
-class loginPopup:
+class loginPopup(Popup):
+    def __init__(self,**kwargs):
+        super(loginPopup,self).__init__(**kwargs)
     
     def build(self):
         box= BoxLayout(orientation='vertical')
@@ -180,7 +187,9 @@ class loginPopup:
             er = Error('Complete todos los campos', title='Error',size_hint=(None,None),size=(600,200))
             er.open()
 
-class MenuPrincipal:
+class MenuPrincipal(Popup):
+    def __init__(self,**kwargs):
+        super(MenuPrincipal,self).__init__(**kwargs)
 
     def build(self,u):
         box = BoxLayout(orientation='vertical')
@@ -212,7 +221,11 @@ class MenuPrincipal:
         log = loginPopup()
         log.build()
 
-class registroPop:
+class registroPop(Popup):
+
+    def __init__(self,**kwargs):
+        super(registroPop,self).__init__(**kwargs)
+
     def build(self):
         box= BoxLayout(orientation='vertical')
         gLayout= GridLayout(cols=2)
@@ -272,7 +285,9 @@ class registroPop:
             er2=Error('Legajo y/o Password no tiene la longitud necesaria', title='Error',size_hint=(None,None),size=(600,200))
             er2.open()
    
-class SeleccionarMateria:
+class SeleccionarMateria(Popup):
+    def __init__(self,**kwargs):
+        super(SeleccionarMateria,self).__init__(**kwargs)
 
     def build(self,u):
 
@@ -284,6 +299,7 @@ class SeleccionarMateria:
         for mat in mats:
             print(mat.id)
             btn = Button(text = mat.nombreMateria)
+            btn.my_id = mat.id
             btn.bind(on_release= lambda x:  self.selecCom(mat,u))
             gLayout.add_widget(btn)
         btnAtras=Button(text='Atras')
@@ -301,7 +317,9 @@ class SeleccionarMateria:
     def cerrar(self):
         self.pop.dismiss()
 
-class SeleccionarComision:
+class SeleccionarComision(Popup):
+    def __init__(self,**kwargs):
+        super(SeleccionarComision,self).__init__(**kwargs)
 
     def build(self,mat,u):
         box= BoxLayout(orientation='horizontal')
