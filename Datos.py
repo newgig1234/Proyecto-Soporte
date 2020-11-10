@@ -1,7 +1,6 @@
-import sqlalchemy
-from sqlalchemy import Column, String, Integer, ForeignKey, Date, Time, MetaData, and_ , create_engine
+from sqlalchemy import Column, String, Integer, ForeignKey, MetaData, and_, create_engine
 from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy.sql.sqltypes import DateTime, INTEGER
+from sqlalchemy.sql.sqltypes import INTEGER
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -21,21 +20,26 @@ class Alumno(Base):
     legajo = Column(String, nullable=False)  # id login
     password = Column(String, nullable=False)
 
-
     def validarUsuario(self, leg, psw):
         conn = crearConexion()
         val = conn.query(Alumno).filter(and_(
-            Alumno.legajo == leg ,Alumno.password == psw)).first()
+            Alumno.legajo == leg, Alumno.password == psw)).first()
         cerrarConexion(conn)
         return val
 
-    def altaUsuario(self,leg,nom,app,mail,cont1):
+    def altaUsuario(self, leg, nom, app, mail, cont1):
         conn = crearConexion()
-        conn.add(Alumno(legajo=leg,nombre=nom,apellido=app,email=mail,password=cont1))
+        conn.add(
+            Alumno(
+                legajo=leg,
+                nombre=nom,
+                apellido=app,
+                email=mail,
+                password=cont1))
         conn.commit()
         cerrarConexion(conn)
-    
-    def buscarUsuario(self,leg):
+
+    def buscarUsuario(self, leg):
         conn = crearConexion()
         q = conn.query(Alumno).filter(Alumno.legajo == leg).first()
         cerrarConexion(conn)
@@ -49,11 +53,18 @@ class Materia(Base):
     anioCursado = Column(String)
     tipoMateria = Column(String)
 
-    def traerMaterias(self): 
+    def traerMaterias(self):
         conn = crearConexion()
         q = conn.query(Materia).all()
         cerrarConexion(conn)
         return q
+
+    def traerMateriaPorNombre(self, nombre_materia):
+        conn = crearConexion()
+        materia = conn.query(Materia).filter(
+            nombre_materia == Materia.nombreMateria).first()
+        cerrarConexion(conn)
+        return materia
 
 
 class Comision(Base):
@@ -61,6 +72,13 @@ class Comision(Base):
     id = Column(INTEGER, primary_key=True, autoincrement=True, nullable=False)
     nroComision = Column(String)
     cicloLectivo = Column(INTEGER)
+
+    def traerComisionPorNumero(self, numero_comision):
+        conn = crearConexion()
+        comision = conn.query(Comision).filter(
+            numero_comision == Comision.nroComision).first()
+        cerrarConexion(conn)
+        return comision
 
 
 class ComisionMateria(Base):
@@ -74,40 +92,59 @@ class ComisionMateria(Base):
     aulaPractica = Column(String, nullable=True)
     profesorT = Column(String)
     email_profesorT = Column(String)
-    profesorP= Column(String)
-    email_profesorP=Column(String)
+    profesorP = Column(String)
+    email_profesorP = Column(String)
 
     materia_id = Column(Integer, ForeignKey(Materia.id))
     comision_id = Column(Integer, ForeignKey(Comision.id))
 
-    relMateria = relationship("Materia", backref="materias", foreign_keys=[materia_id])
-    relComision = relationship("Comision", backref="comisiones", foreign_keys=[comision_id])
+    relMateria = relationship(
+        "Materia",
+        backref="materias",
+        foreign_keys=[materia_id])
+    relComision = relationship(
+        "Comision",
+        backref="comisiones",
+        foreign_keys=[comision_id])
 
     def infoMat(self, cm):
         conn = crearConexion()
-        nm = conn.query(ComisionMateria.relMateria.nombreMateria).filter(
-            ComisionMateria.materia_id == cm.materia_id).first()
-        nc = conn.query(ComisionMateria.relComision.nroComision).filter(
-            ComisionMateria.comision_id == cm.comision_id).first()
+        nm = conn.query(
+            Materia.nombreMateria).filter(
+            and_(
+                ComisionMateria.comision_materia_id == cm.comision_materia_id,
+                ComisionMateria.materia_id == Materia.id)).first()
+        nc = conn.query(
+            Comision.nroComision).filter(
+            and_(
+                ComisionMateria.comision_materia_id == cm.comision_materia_id,
+                ComisionMateria.comision_id == Comision.id)).first()
         cerrarConexion(conn)
-        return nm, nc
-    
+        return nm[0], nc[0]
 
-    def traerComisiones(self, m):
+    def traerComisiones(self, materia):
         conn = crearConexion()
-        q = conn.query(Comision).filter(and_(ComisionMateria.materia_id == m.id, ComisionMateria.comision_id == Comision.id)).all()
+
+        q = conn.query(Comision).filter(
+            and_(
+                ComisionMateria.materia_id == materia.id,
+                ComisionMateria.comision_id == Comision.id)).all()
         cerrarConexion(conn)
         return q
 
     def devolver(self, m, c):
         conn = crearConexion()
-        q = conn.query(ComisionMateria).filter(and_(ComisionMateria.materia_id == m.id, ComisionMateria.comision_id == c.id)).first()
+        q = conn.query(ComisionMateria).filter(
+            and_(
+                ComisionMateria.materia_id == m.id,
+                ComisionMateria.comision_id == c.id)).first()
         cerrarConexion(conn)
         return q
-    
+
     def nombreMat(self):
         conn = crearConexion()
-        q = conn.query(Materia).filter(ComisionMateria.materia_id == Materia.id).first()
+        q = conn.query(Materia).filter(
+            ComisionMateria.materia_id == Materia.id).first()
         cerrarConexion(conn)
         return q
 
@@ -122,30 +159,39 @@ class AlumnoComisionMateria(Base):
     relAlumno = relationship(
         "Alumno", backref="alumnos", foreign_keys=[alumno_id])
     relComisionMateria = relationship(
-        "ComisionMateria", backref="comisionmateria", foreign_keys=[comision_materia_id])
+        "ComisionMateria",
+        backref="comisionmateria",
+        foreign_keys=[comision_materia_id])
 
     def __repr__(self):
         pass
 
-    def alta(self,cm,u):
+    def alta(self, cm, u):
         conn = crearConexion()
-        conn.add(AlumnoComisionMateria(alumno_id=u.id,comision_materia_id=cm.comision_materia_id))
+        conn.add(
+            AlumnoComisionMateria(
+                alumno_id=u.id,
+                comision_materia_id=cm.comision_materia_id))
         conn.commit()
         cerrarConexion(conn)
         return True
 
     def traerMateriasAlumno(self, alu):
         conn = crearConexion()
-        q = conn.query(ComisionMateria).filter(and_(
-            AlumnoComisionMateria.alumno_id == alu.id, 
-            AlumnoComisionMateria.comision_materia_id == ComisionMateria.comision_materia_id,)).all()
+        q = conn.query(ComisionMateria).filter(
+            and_(
+                AlumnoComisionMateria.alumno_id == alu.id,
+                AlumnoComisionMateria.comision_materia_id == ComisionMateria.comision_materia_id,
+            )).all()
         cerrarConexion(conn)
         return q
 
     def bajaMateria(self, a, cm):
         conn = crearConexion()
-        conn.query(AlumnoComisionMateria).filter(and_(AlumnoComisionMateria.relAlumno.id == a.id 
-            ,AlumnoComisionMateria.relComisionMateria.comision_materia_id == cm.comision_materia_id)).delete()
+        conn.query(AlumnoComisionMateria).filter(
+            and_(
+                AlumnoComisionMateria.alumno_id == a.id,
+                AlumnoComisionMateria.comision_materia_id == cm.comision_materia_id)).delete()
         conn.commit()
         cerrarConexion(conn)
         return True

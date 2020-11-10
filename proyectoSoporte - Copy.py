@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import kivy
 from kivy.app import App
 from kivy.uix.popup import Popup
@@ -9,10 +11,13 @@ from kivy.uix.textinput import TextInput
 from sqlalchemy.sql.elements import Null
 from kivy.properties import NumericProperty
 
+
 from Datos import Alumno,Materia,Comision,AlumnoComisionMateria,ComisionMateria
 kivy.require("1.11.0")
 
 #------------------------------------------------------------------------------------- 
+#class myButton()
+
 class Error(Popup):
     def __init__(self,msj, **kwargs):
         super().__init__(**kwargs)
@@ -23,11 +28,11 @@ class Error(Popup):
     def construir(self, msj):
         mensaje = Label(text = msj)
         btn = Button(text = "Aceptar")
-        btn.bind(on_release= lambda x:  self.cerrar)
+        btn.bind(on_release= lambda x:  self.cerrar())
         self.error.add_widget(mensaje)
         self.error.add_widget(btn)
         
-    def cerrar(self,ev):
+    def cerrar(self):
         self.error.dismiss()
 
 class Exito(Popup):
@@ -41,11 +46,11 @@ class Exito(Popup):
     def construir(self, msj):
         mensaje = Label(text = msj)
         btn = Button(text = "Aceptar")
-        btn.bind(on_release= lambda x:  self.cerrar)
+        btn.bind(on_release= lambda x:  self.cerrar())#se puede modificar para simplificar
         self.exito.add_widget(mensaje)
         self.exito.add_widget(btn)
         
-    def cerrar(self,ev):
+    def cerrar(self):
         self.exito.dismiss()
 
 class MostrarMaterias(Popup):
@@ -60,15 +65,15 @@ class MostrarMaterias(Popup):
         if mats:
             for matcom in mats:
                 mi = MostrarInformacion()
-                nm = matcom.nombreMat
+                nm = matcom.nombreMat()
                 btn = Button(text = nm.nombreMateria)
                 btn.bind(on_release= lambda x: mi.build(matcom,u))
                 gLayout.add_widget(btn)
         btnVolver = Button(text='Atras')
-        btnVolver.bind(on_release= self.cerrar)
+        btnVolver.bind(on_release= lambda x: self.cerrar())
         box.add_widget(gLayout)
         box.add_widget(btnVolver)
-        self.pop= Popup(Title='Mis Materias',content=box)
+        self.pop= Popup(title='Mis Materias',content=box)
         self.pop.open()
         
     def cerrar(self):
@@ -81,10 +86,10 @@ class MostrarInformacion(Popup):
     def build(self,matcom,u):
         box= BoxLayout(orientation='vertical')
         box.clear_widgets()
-        gLayout=GridLayout(cols=2)
+        gLayout =GridLayout(cols=2)
         gLayout.clear_widgets()
-        comMat= ComisionMateria()
-        nomMateria,numeroComision = comMat.infoMat(matcom)
+        comMat = ComisionMateria()
+        nomMateria ,numeroComision = comMat.infoMat(matcom)
         btnBaja= Button(text='Darse de baja de una materia')
         btnBaja.bind(on_release= lambda x:  self.darBajaMaeteria(matcom,u))
         mm = MostrarMaterias()
@@ -103,7 +108,7 @@ class MostrarInformacion(Popup):
         horaT = Label(text=matcom.horarioTeoria)
         diaT = Label(text=matcom.diaTeoria)
         aulaT = Label(text=matcom.aulaTeoria)
-        horaP = Label(text=matcom.horaPractica)
+        horaP = Label(text=matcom.horarioPractica)
         diaP = Label(text=matcom.diaPractica)
         aulaP =  Label(text=matcom.aulaPractica)
         gLayout.add_widget(nom)
@@ -125,7 +130,7 @@ class MostrarInformacion(Popup):
         box.add_widget(gLayout)
         box.add_widget(btnAtras)
         box.add_widget(btnBaja)
-        self.pop = Popup(Title='Mostrar Informacion',content=box)
+        self.pop = Popup(title='Mostrar Informacion',content=box)
         self.pop.open()
 
     def darBajaMaeteria(self,mc,u):
@@ -293,15 +298,13 @@ class SeleccionarMateria(Popup):
 
         box=BoxLayout(orientation='vertical')
         txt = Label(text ='MATERIAS')
-        gLayout= GridLayout(cols=2)
-        m=Materia()
+        gLayout = GridLayout(cols=2)
+        m =Materia()
         mats = m.traerMaterias()
-        for mat in mats:
-            print(mat.id)
-            btn = Button(text = mat.nombreMateria)
-            btn.my_id = mat.id
-            btn.bind(on_release= lambda x:  self.selecCom(mat,u))
-            gLayout.add_widget(btn)
+        buttons=[Button(text=mat.nombreMateria) for mat in mats]
+        for button in buttons:
+            button.bind(on_release= lambda button:  self.selecCom(button.text,u))
+            gLayout.add_widget(button)
         btnAtras=Button(text='Atras')
         btnAtras.bind(on_release= lambda x:  self.cerrar())
         box.add_widget(txt)
@@ -310,9 +313,9 @@ class SeleccionarMateria(Popup):
         self.pop = Popup(title='SelecionarMateria',content=box)
         self.pop.open()
 
-    def selecCom(self,m,u):
+    def selecCom(self,nombre_materia,u):
         sm = SeleccionarComision()
-        sm.build(m,u)
+        sm.build(nombre_materia,u)
         
     def cerrar(self):
         self.pop.dismiss()
@@ -321,36 +324,31 @@ class SeleccionarComision(Popup):
     def __init__(self,**kwargs):
         super(SeleccionarComision,self).__init__(**kwargs)
 
-    def build(self,mat,u):
+    def build(self,nombre_materia,u):
         box= BoxLayout(orientation='horizontal')
         txt=Label(text='Seleccione Comision')
         gLayout = GridLayout(cols=2)
         c= ComisionMateria()
-        comis = c.traerComisiones(mat)
-        if comis:
-            print('Existe')
-            print(comis)
-        else:
-            print('No existe')
-            print(comis)
-        for com in comis:
-            btn=Button(text=com.nroComision)
-            btn.bind(on_release= lambda x:  self.confirmar(mat,com,u))
-            gLayout.add_widget(btn)
+        materia=Materia().traerMateriaPorNombre(nombre_materia)
+        comisiones = c.traerComisiones(materia)
+        buttons=[Button(text=comision.nroComision) for comision in comisiones]
+        for button in buttons:
+            button.bind(on_release= lambda button:  self.confirmar(nombre_materia,button.text,u))
+            gLayout.add_widget(button)
         box.add_widget(txt)
         box.add_widget(gLayout)
         self.pop = Popup(title='Seleccionar Materia',content=box)
         self.pop.open()
 
 
-    def confirmar(self,m,c,u):
+    def confirmar(self,nombre_materia,numero_comision,u):
         box= BoxLayout(orientation='vertical')
-        txt= Label(text='¿Desea inscribirse a {materia} en la comision {comision}?'.format(materia=m.nombreMateria,comision=c.nroComision))
+        txt= Label(text='¿Desea inscribirse a {materia} en la comision {comision}?'.format(materia=nombre_materia,comision=numero_comision))
         gLayout= GridLayout(cols=2)
         btnCancelar=Button(text='Cancelar')
-        btnCancelar.bind(on_release= lambda x:  self.build(m,u))#funcion boton cancelar
+        btnCancelar.bind(on_release= lambda x:  self.build(nombre_materia,u))#funcion boton cancelar
         btnAceptar=Button(text='Aceptar')
-        btnAceptar.bind(on_release= lambda x:  self.altaACM(m,c,u))#funcion boton aceptar
+        btnAceptar.bind(on_release= lambda x:  self.altaACM(nombre_materia,numero_comision,u))#funcion boton aceptar
         box.add_widget(txt)
         gLayout.add_widget(btnCancelar)
         gLayout.add_widget(btnAceptar)
@@ -358,9 +356,11 @@ class SeleccionarComision(Popup):
         self.pop=Popup(title='Confirmar',content=box)
         self.pop.open()
     
-    def altaACM(self,m,c,u):
+    def altaACM(self,nombre_materia,numero_comision,u):
+        materia= Materia().traerMateriaPorNombre(nombre_materia)
+        comision= Comision().traerComisionPorNumero(numero_comision)
         icm = ComisionMateria()
-        cm = icm.devolver(m,c)
+        cm = icm.devolver(materia,comision)
         iacm = AlumnoComisionMateria()
         res = iacm.alta(cm,u)
         if res==True:
